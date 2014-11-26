@@ -1,0 +1,20 @@
+*.pyc
+*~
+*.swp
+*.un~
+*.xcuserdatad
+\#*
+.#*
+.DS_Store
+.AppleDouble
+session_ids.txt
+xcuserdata/**/*
+*.iml
+# Java class files
+*.class
+# For android studio
+.idea
+build/
+Likes.xccheckout
+._*
+*.save
