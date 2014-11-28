@@ -64,8 +64,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mylikes.likes.etchasketch.R;
-
 import com.mylikes.likes.etchasketch.ToolButton.SwatchButton;
 
 public class MarkersActivity extends Activity {
@@ -268,7 +266,7 @@ public class MarkersActivity extends Activity {
         win.setAttributes(lp);
         win.requestFeature(Window.FEATURE_NO_TITLE);
 
-        setContentView(R.layout.main);
+        setContentView(R.layout.fragment_editor);
         mSlate = (Slate) getLastNonConfigurationInstance();
         if (mSlate == null) {
         	mSlate = new Slate(this);
@@ -296,7 +294,7 @@ public class MarkersActivity extends Activity {
         root.addView(mZoomView, 0);
         
         mMediaScannerConnection =
-                new MediaScannerConnection(MarkersActivity.this, mMediaScannerClient); 
+                new MediaScannerConnection(MarkersActivity.this, mMediaScannerClient);
 
         
         if (icicle != null) {
@@ -504,6 +502,12 @@ public class MarkersActivity extends Activity {
         // show it
         alertDialog.show();
 
+    }
+
+    public Bitmap renderBitmap() {
+        Bitmap base = mSlate.getBitmap();
+        // TODO: render any text overlays or stickers at this point
+        return base;
     }
 
     private void loadSettings() {
