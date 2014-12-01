@@ -18,7 +18,9 @@ package com.mylikes.likes.etchasketch;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,10 +40,12 @@ import android.graphics.Region;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 
-import com.mylikes.likes.etchasketch.R;
+import java.util.ArrayList;
 
 public class Slate extends View {
 
@@ -118,6 +122,16 @@ public class Slate extends View {
     private float mPanX = 0f, mPanY = 0f;
     private int mMemClass;
     private boolean mLowMem;
+
+    private ArrayList<MoveableDrawing> overlays = new ArrayList<MoveableDrawing>();
+    private boolean moveMode = false;
+    private int moveDrawingIndex;
+    private float moveDrawingStartX, moveDrawingStartY;
+    private long touchStartTime;
+    private int resizeDrawingIndex;
+    private String resizeDrawingCorner;
+    private MoveableDrawing selectedDrawing = null;
+    private int currentColor;
 
     public interface SlateListener {
         void strokeStarted();
@@ -203,6 +217,9 @@ public class Slate extends View {
 
         public void setPenType(int shape) {
             mRenderer.setPenType(shape);
+        }
+        public int getPenType() {
+            return mRenderer.getPenType();
         }
     }
     
@@ -688,6 +705,92 @@ public class Slate extends View {
         invalidate();
     }
 
+    public void addText(int x, int y, String text) {
+        TextDrawing drawing = new TextDrawing(getContext(), text, x, y);
+        drawing.setColor(currentColor);
+        overlays.add(drawing);
+        selectedDrawing = drawing;
+        invalidate();
+        // TODO: add to undo stack
+    }
+
+    public void promptForText(final int x, final int y) {
+        promptForText(x, y, null);
+    }
+    public void promptForText(TextDrawing drawing) {
+        promptForText(0, 0, drawing);
+    }
+    public void promptForText(final int x, final int y, final TextDrawing drawing) {
+        LayoutInflater li = LayoutInflater.from(getContext());
+        View promptsView = li.inflate(R.layout.prompts, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                getContext());
+
+        // set prompts.xml to alertdialog builder
+        alertDialogBuilder.setView(promptsView);
+
+        final EditText userInput = (EditText) promptsView
+                .findViewById(R.id.editTextDialogUserInput);
+        if (drawing != null) {
+            String text = drawing.getText();
+            userInput.setText(text);
+            userInput.setSelection(text.length());
+        }
+
+        // TODO: add font dropdown to dialog
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                if (drawing != null) {
+                                    drawing.setText(userInput.getText().toString());
+                                    invalidate();
+                                } else {
+                                    addText(x, y, userInput.getText().toString());
+                                }
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        alertDialogBuilder.create().show();
+    }
+
+    public void maybeRemoveDrawing(final MoveableDrawing drawing) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                getContext());
+        alertDialogBuilder.setTitle("Delete this?");
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                overlays.remove(drawing);
+                                // TODO: add to undo stack
+                                if (selectedDrawing == drawing) selectedDrawing = null;
+                                invalidate();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        alertDialogBuilder.create().show();
+    }
+
+
+    public void addSticker(int x, int y, String path) {
+        // TODO: create StickerDrawing class
+    }
+
     public void paintBitmap(Bitmap b) {
         if (mTiledCanvas == null) {
             mPendingPaintBitmap = b;
@@ -721,7 +824,12 @@ public class Slate extends View {
     public Bitmap getBitmap() {
         if (mTiledCanvas != null) {
             commitStroke();
-            return mTiledCanvas.toBitmap();
+            Bitmap bitmap = mTiledCanvas.toBitmap();
+            Canvas canvas = new Canvas(bitmap);
+            for (MoveableDrawing drawing : overlays) {
+                drawing.renderInto(canvas, false);
+            }
+            return bitmap;
         }
         return null;
     }
@@ -748,12 +856,25 @@ public class Slate extends View {
             // ...or not; the current behavior allows RAINBOW MODE!!!1!
             plotter.setPenColor(color);
         }
+        Log.d(TAG, "Set pen to : " + Integer.toHexString(color));
+        if (moveMode && selectedDrawing != null) {
+            selectedDrawing.setColor(color);
+            invalidate();
+        }
+        currentColor = color;
     }
     
     public void setPenType(int shape) {
         for (MarkersPlotter plotter : mStrokes) {
             plotter.setPenType(shape);
         }
+    }
+
+    public int getPenType() {
+        for (MarkersPlotter plotter : mStrokes) {
+            return plotter.getPenType();
+        }
+        return -1;
     }
     
     @Override
@@ -826,6 +947,9 @@ public class Slate extends View {
             mTiledCanvas.drawTo(canvas, 0, 0, mBlitPaint, false); // @@ set to true for dirty tile updates
             if (0 != (mDebugFlags & FLAG_DEBUG_STROKES)) {
                 drawStrokeDebugInfo(canvas);
+            }
+            for (MoveableDrawing drawing : overlays) {
+                drawing.renderInto(canvas, moveMode && drawing == selectedDrawing);
             }
 
             canvas.restore();
@@ -901,6 +1025,11 @@ public class Slate extends View {
         return span; 
     }
 
+    public void setMoveMode(boolean moveMode) {
+        this.moveMode = moveMode;
+        invalidate();
+    }
+
     @SuppressLint("NewApi")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -919,6 +1048,76 @@ public class Slate extends View {
         }
 
         if (mZoomMode) {
+            return false;
+        }
+
+        if (moveMode) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                touchStartTime = System.currentTimeMillis();
+                moveDrawingStartX = event.getX();
+                moveDrawingStartY = event.getY();
+                int i = 0;
+                selectedDrawing = null;
+                moveDrawingIndex = -1;
+                resizeDrawingIndex = -1;
+                resizeDrawingCorner = null;
+                for (MoveableDrawing drawing : overlays) {
+                    String corner = drawing.closestCorner((int)moveDrawingStartX, (int)moveDrawingStartY);
+                    if (corner != null) {
+                        selectedDrawing = drawing;
+                        if (corner.startsWith("b")) {
+                            resizeDrawingIndex = i;
+                        }
+                        resizeDrawingCorner = corner;
+                        break;
+                    }
+                    if (drawing.contains((int)moveDrawingStartX, (int)moveDrawingStartY)) {
+                        selectedDrawing = drawing;
+                        moveDrawingIndex = i;
+                        break;
+                    }
+                    i++;
+                }
+                if (i >= overlays.size()) {
+                    return true;
+                }
+                Log.d(TAG, "Start dragging overlay");
+                return true;
+            } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
+                if (moveDrawingIndex == -1 && resizeDrawingIndex == -1 && System.currentTimeMillis() - touchStartTime < 400 && Math.abs(event.getX() - moveDrawingStartX) + Math.abs(event.getY() - moveDrawingStartY) < 8) {
+                    if (resizeDrawingCorner != null && selectedDrawing != null) {
+                        if (resizeDrawingCorner == "tl" && selectedDrawing instanceof TextDrawing) {
+                            promptForText((TextDrawing)selectedDrawing);
+                        } else if (resizeDrawingCorner == "tr") {
+                            maybeRemoveDrawing(selectedDrawing);
+                        }
+                    } else {
+                        promptForText((int) event.getX(), (int) event.getY());
+                    }
+                }
+                moveDrawingIndex = -1;
+                Log.d(TAG, "Stop dragging overlay");
+                // TODO: add to undo stack
+                return true;
+            } else if (moveDrawingIndex >= 0 && moveDrawingIndex < overlays.size() && action == MotionEvent.ACTION_MOVE) {
+                float x = event.getX();
+                float y = event.getY();
+                overlays.get(moveDrawingIndex).moveBy((int)(x - moveDrawingStartX), (int)(y - moveDrawingStartY));
+                // TODO: only invalidate relevant Rect
+                invalidate();
+                moveDrawingStartX = x;
+                moveDrawingStartY = y;
+                return true;
+            } else if (resizeDrawingIndex >= 0 && resizeDrawingIndex < overlays.size() && action == MotionEvent.ACTION_MOVE) {
+                float x = event.getX();
+                float y = event.getY();
+                overlays.get(resizeDrawingIndex).resizeCorner(resizeDrawingCorner, (int) (x - moveDrawingStartX), (int) (y - moveDrawingStartY));
+                // TODO: only invalidate relevant Rect
+                invalidate();
+                moveDrawingStartX = x;
+                moveDrawingStartY = y;
+                return true;
+            }
             return false;
         }
 

@@ -26,4 +26,9 @@
     <dimen name="tool_palette_gutter">6dp</dimen>
     <dimen name="status_bar_height">25dp</dimen>
     <dimen name="tools_margin_top">@dimen/action_bar_height</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="photo_height">120dp</dimen>
+    <dimen name="photo_width">120dp</dimen>
+    <dimen name="default_font_size">40sp</dimen>
 </resources>

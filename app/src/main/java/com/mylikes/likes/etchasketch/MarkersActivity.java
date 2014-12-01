@@ -66,7 +66,7 @@ import android.widget.Toast;
 
 import com.mylikes.likes.etchasketch.ToolButton.SwatchButton;
 
-public class MarkersActivity extends Activity {
+public class MarkersActivity extends Activity implements ShakeSensor.ShakeListener {
     final static int LOAD_IMAGE = 1000;
 
     private static final String TAG = "Markers";
@@ -102,7 +102,10 @@ public class MarkersActivity extends Activity {
 
     private SharedPreferences mPrefs;
 
+    private ShakeSensor shakeSensor;
+
     private LinkedList<String> mDrawingsToScan = new LinkedList<String>();
+    private boolean firstTextClick = true;
 
     protected MediaScannerConnection mMediaScannerConnection;
     private String mPendingShareFile;
@@ -141,50 +144,8 @@ public class MarkersActivity extends Activity {
                 }
             };
 
-    private SensorManager mSensorManager;
-    private float mAccel; // acceleration apart from gravity
-    private float mAccelCurrent; // current acceleration including gravity
-    private float mAccelLast; // last acceleration including gravity
-    private float lastX, lastY, lastZ;
-    private Date lastShake, lastHighAccel;
 
-    private final SensorEventListener mSensorListener = new SensorEventListener() {
-
-        public void onSensorChanged(SensorEvent se) {
-            float x = se.values[0];
-            float y = se.values[1];
-            float z = se.values[2];
-            mAccelLast = mAccelCurrent;
-            mAccelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
-            float delta = mAccelCurrent - mAccelLast;
-            mAccel = mAccel * 0.9f + delta; // perform low-cut filter
-            if (mAccel > 15) {
-                Date now = new Date();
-                Log.d(TAG, "current accel: " + mAccel);
-                if (lastHighAccel == null) {
-                    lastHighAccel = now;
-                    lastX = x;
-                    lastY = y;
-                    lastZ = z;
-                } else if (now.getTime() - lastHighAccel.getTime() < 500
-                 && cosBetween(x, y, z, lastX, lastY, lastZ) < 0 // we require two fast jerks in opposite directions to count as a shake
-                        && (lastShake == null || (now.getTime() - lastShake.getTime()) > 20000)) { // don't shake one right after the other
-                    onShake();
-                    lastShake = now;
-                    lastHighAccel = null;
-                }
-            }
-        }
-
-        private float cosBetween(float x1, float y1, float z1, float x2, float y2, float z2) {
-            // dot product divided by the product of the magnitudes is cos θ between them
-            return (float)((x1*x2 + y1*y2 + z1*z2) / Math.sqrt(x1*x1 + y1*y1 + z1*z1) / Math.sqrt(x2*x2 + y2*y2 + z2*z2));
-        }
-
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
-    };
-
+    @Override
     public void onShake() {
         clickClear(null);
     }
@@ -270,15 +231,22 @@ public class MarkersActivity extends Activity {
         mSlate = (Slate) getLastNonConfigurationInstance();
         if (mSlate == null) {
         	mSlate = new Slate(this);
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            int w = ViewGroup.LayoutParams.MATCH_PARENT, h = ViewGroup.LayoutParams.MATCH_PARENT;
+            if (getIntent().hasExtra("width")) {
+                w = getIntent().getIntExtra("width", w);
+                h = getIntent().getIntExtra("height", h);
+            }
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(w, h);
             params.addRule(RelativeLayout.RIGHT_OF, R.id.tools);
             params.addRule(RelativeLayout.ABOVE, R.id.colors);
             params.addRule(RelativeLayout.BELOW, R.id.actionbar);
             mSlate.setLayoutParams(params);
 
         	// Load the old buffer if necessary
-            if (!mJustLoadedImage) {
-                loadDrawing(WIP_FILENAME, true);
+            if (getIntent().hasExtra("picture")) {
+                loadDrawing(getIntent().getStringExtra("picture"));
+            } else if (!mJustLoadedImage) {
+                loadDrawing(WIP_FILENAME, true, false);
             } else {
                 mJustLoadedImage = false;
             }
@@ -310,7 +278,7 @@ public class MarkersActivity extends Activity {
         spotSizeTool.setOnSizeChangedListener(new SpotSizeBar.OnSizeChangedListener() {
             @Override
             public void sizeChanged(float size) {
-                mSlate.setPenSize(size * 0.5f, size * 1.5f);
+                setPenSize(size);
                 Log.d(TAG, "Size changed to: " + size);
                 mPrefs.edit().putInt(PREF_LAST_HUDSTATE, (int)size).commit();
             }
@@ -327,7 +295,7 @@ public class MarkersActivity extends Activity {
             public void setPenMode(ToolButton tool, float min, float max) {
                 mSlate.setZoomMode(false);
                 mZoomView.setEnabled(false);
-                mSlate.setPenSize(min, max);
+                setPenSize((min + max) / 2.0f);
                 mLastTool = mActiveTool;
                 mActiveTool = tool;
                 
@@ -454,54 +422,17 @@ public class MarkersActivity extends Activity {
         findViewById(R.id.enter_text).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                promptForText();
+                mActivePenType.setSelected(false);
+                v.setSelected(true);
+                mSlate.setMoveMode(true);
+                if (firstTextClick) {
+                    Toast.makeText(MarkersActivity.this, "Tap anywhere to start typing", Toast.LENGTH_SHORT).show();
+                    firstTextClick = false;
+                }
             }
         });
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-        mAccel = 0.00f;
-        mAccelCurrent = SensorManager.GRAVITY_EARTH;
-        mAccelLast = SensorManager.GRAVITY_EARTH;
-        // clickDebug(null); // auto-debug mode for testing devices
-    }
-
-    public void promptForText() {
-        LayoutInflater li = LayoutInflater.from(this);
-        View promptsView = li.inflate(R.layout.prompts, null);
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                this);
-
-        // set prompts.xml to alertdialog builder
-        alertDialogBuilder.setView(promptsView);
-
-        final EditText userInput = (EditText) promptsView
-                .findViewById(R.id.editTextDialogUserInput);
-
-        // set dialog message
-        alertDialogBuilder
-                .setCancelable(false)
-                .setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id) {
-                                // get user input and set it to result
-                                // edit text
-                                Log.d(TAG, "Got text: " + userInput.getText());
-                            }
-                        })
-                .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-
-        // show it
-        alertDialog.show();
-
+        shakeSensor = new ShakeSensor(this);
     }
 
     public Bitmap renderBitmap() {
@@ -518,7 +449,7 @@ public class MarkersActivity extends Activity {
             size = 15;
         }
         spotSizeTool.setSize(size);
-        mSlate.setPenSize(size * 0.5f, size * 1.5f);
+        setPenSize(size);
 
         mLastTool = mActiveTool;
         if (mActiveTool != null) mActiveTool.click();
@@ -543,10 +474,15 @@ public class MarkersActivity extends Activity {
         if (mActiveColor != null) mActiveColor.click();
     }
 
+    private void setPenSize(float size) {
+        float variation = mSlate.getPenType() == Slate.TYPE_FOUNTAIN_PEN ? 0 : 0.5f;
+        mSlate.setPenSize(size * (1.0f - variation), size * (1.0f + variation));
+    }
+
     @Override
     public void onPause() {
         super.onPause();
-        mSensorManager.unregisterListener(mSensorListener);
+        shakeSensor.unregister();
         saveDrawing(WIP_FILENAME, true);
     }
 
@@ -554,7 +490,8 @@ public class MarkersActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        shakeSensor.register();
+        shakeSensor.setShakeListener(this);
         String orientation = getString(R.string.orientation);
         
         setRequestedOrientation(
@@ -655,6 +592,9 @@ public class MarkersActivity extends Activity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mSlate.clear();
+                        if (getIntent().hasExtra("picture")) {
+                            loadDrawing(getIntent().getStringExtra("picture"));
+                        }
                     }
                 })
                 .setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
@@ -667,7 +607,7 @@ public class MarkersActivity extends Activity {
     }
 
     public boolean loadDrawing(String filename) {
-        return loadDrawing(filename, false);
+        return loadDrawing(filename, false, true);
     }
 
     @TargetApi(8)
@@ -681,10 +621,15 @@ public class MarkersActivity extends Activity {
         return d;
     }
 
-    public boolean loadDrawing(String filename, boolean temporary) {
+    public boolean loadDrawing(String filename, boolean temporary, boolean absolute) {
         File d = getPicturesDirectory();
-        d = new File(d, temporary ? IMAGE_TEMP_DIRNAME : IMAGE_SAVE_DIRNAME);
-        final String filePath = new File(d, filename).toString();
+        final String filePath;
+        if (absolute) {
+            filePath = filename;
+        } else {
+            d = new File(d, temporary ? IMAGE_TEMP_DIRNAME : IMAGE_SAVE_DIRNAME);
+            filePath = new File(d, filename).toString();
+        }
         if (DEBUG) Log.d(TAG, "loadDrawing: " + filePath);
         
         if (d.exists()) {
@@ -912,6 +857,9 @@ public class MarkersActivity extends Activity {
     
     public void setPenType(int type) {
         mSlate.setPenType(type);
+        setPenSize(spotSizeTool.getSize());
+        findViewById(R.id.enter_text).setSelected(false);
+        mSlate.setMoveMode(false);
     }
     
     protected void loadImageFromIntent(Intent imageReturnedIntent) {
@@ -922,7 +870,7 @@ public class MarkersActivity extends Activity {
     protected void loadImageFromContentUri(Uri contentUri) {
         Toast.makeText(this, "Loading from " + contentUri, Toast.LENGTH_SHORT).show();
 
-        loadDrawing(WIP_FILENAME, true);
+        loadDrawing(WIP_FILENAME, true, false);
         mJustLoadedImage = true;
 
         try {

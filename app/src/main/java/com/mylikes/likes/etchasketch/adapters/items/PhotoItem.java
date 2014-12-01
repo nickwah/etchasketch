@@ -1,5 +1,3 @@
-package com.mylikes.likes.etchasketch;
-
 /*
  * Copyright (c) 2014 Rex St. John on behalf of AirPair.com
  *
@@ -22,37 +20,42 @@ package com.mylikes.likes.etchasketch;
  * THE SOFTWARE.
  */
 
-import android.app.Fragment;
+package com.mylikes.likes.etchasketch.adapters.items;
+
 import android.net.Uri;
-import android.os.Bundle;
 
 /**
+ * Used to represent a photo item.
+ *
  * Created by Rex St. John (on behalf of AirPair.com) on 3/4/14.
  */
-public class BaseFragment extends Fragment {
+public class PhotoItem {
 
-    public static final String ARG_SECTION_NUMBER = "ARG_SECTION_NUMBER";
+    // Ivars.
+    private Uri thumbnailUri;
+    private Uri fullImageUri;
 
-    /**
-     * Default empty constructor
-     */
-    public BaseFragment(){
-        //
+    public PhotoItem(Uri thumbnailUri,Uri fullImageUri) {
+        this.thumbnailUri = thumbnailUri;
+        this.fullImageUri = fullImageUri;
     }
 
     /**
-     * This interface must be implemented by activities that contain this
-     * mFragment to allow an interaction in this mFragment to be communicated
-     * to the mActivity and potentially other fragments contained in that
-     * mActivity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     * Getters and setters
      */
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
-        public void onFragmentInteraction(String id);
-        public void onFragmentInteraction(int actionId);
+    public Uri getThumbnailUri() {
+        return thumbnailUri;
+    }
+
+    public void setThumbnailUri(Uri thumbnailUri) {
+        this.thumbnailUri = thumbnailUri;
+    }
+
+    public Uri getFullImageUri() {
+        return fullImageUri;
+    }
+
+    public void setFullImageUri(Uri fullImageUri) {
+        this.fullImageUri = fullImageUri;
     }
 }

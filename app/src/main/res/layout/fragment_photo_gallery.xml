@@ -21,32 +21,23 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-        >
+    android:layout_height="fill_parent">
     <FrameLayout
-        android:id="@+id/camera_preview"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"
-        />
-
-
-    <RelativeLayout
-        android:id="@+id/innerRelativeLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" >
-        <Button
-            android:id="@+id/button_capture"
-            android:text="Capture"
+        android:layout_height="fill_parent">
+        <GridView
+            style="@style/GridView.PhotoGallery"
+            android:id="@android:id/list"
+            android:numColumns="3" />
+        <TextView
+            android:id="@+id/empty"
             android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:layout_margin="10dp"
-            android:layout_gravity="bottom"
-            />
-    </RelativeLayout>
-</RelativeLayout>
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:visibility="invisible"/>
+    </FrameLayout>
+</LinearLayout>

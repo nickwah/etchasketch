@@ -1,5 +1,3 @@
-package com.mylikes.likes.etchasketch;
-
 /*
  * Copyright (c) 2014 Rex St. John on behalf of AirPair.com
  *
@@ -22,9 +20,12 @@ package com.mylikes.likes.etchasketch;
  * THE SOFTWARE.
  */
 
-import android.app.AlertDialog;
+package com.mylikes.likes.etchasketch.fragments;
+
 import android.content.Context;
-import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,7 +43,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.mylikes.likes.etchasketch.MainActivity;
 import com.mylikes.likes.etchasketch.R;
+import com.mylikes.likes.etchasketch.utilities.DialogHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -65,6 +68,7 @@ public class NativeCameraFragment extends BaseFragment {
 
     // Native camera.
     private Camera mCamera;
+    private int mCameraId;
 
     // View to display the camera output.
     private CameraPreview mPreview;
@@ -152,10 +156,16 @@ public class NativeCameraFragment extends BaseFragment {
      * Safe method for getting a camera instance.
      * @return
      */
-    public static Camera getCameraInstance(){
+    public Camera getCameraInstance(){
         Camera c = null;
         try {
-            c = Camera.open(); // attempt to get a Camera instance
+            if (Camera.getNumberOfCameras() >= 2) {
+                c = Camera.open(1);
+                mCameraId = 1;
+            } else {
+                c = Camera.open(); // attempt to get a Camera instance
+                mCameraId = 0;
+            }
         }
         catch (Exception e){
             e.printStackTrace();
@@ -243,6 +253,7 @@ public class NativeCameraFragment extends BaseFragment {
         {
             try{
                 mCamera.setPreviewDisplay(mHolder);
+                mCamera.setDisplayOrientation(90);
                 mCamera.startPreview();
             }
             catch(Exception e){
@@ -314,14 +325,38 @@ public class NativeCameraFragment extends BaseFragment {
                 Camera.Parameters parameters = mCamera.getParameters();
 
                 // Set the auto-focus mode to "continuous"
-                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                }
 
                 // Preview size must exist.
                 if(mPreviewSize != null) {
                     Camera.Size previewSize = mPreviewSize;
                     parameters.setPreviewSize(previewSize.width, previewSize.height);
                 }
+                List<Camera.Size> sizes = mCamera.getParameters().getSupportedPictureSizes();
+                Camera.Size finalSize = null;
+                for (Camera.Size size : sizes) {
+                    Log.d("Camera", "Size: " + size);
+                    float aspect = (size.width / (float)size.height);
+                    if (finalSize == null || size.width > getWidth() && size.height > getHeight() && aspect > 1.4 && aspect < 1.9) {
+                        finalSize = size;
+                    }
+                }
+                parameters.setPictureSize(finalSize.width, finalSize.height);
 
+                android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+                android.hardware.Camera.getCameraInfo(mCameraId, info);
+                int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
+                int degrees = 0, result;
+                if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                    result = (info.orientation + degrees) % 360;
+                    result = (360 - result) % 360;  // compensate the mirror
+                } else {  // back-facing
+                    result = (info.orientation - degrees + 360) % 360;
+                }
+                Log.d("Camera", "orientation: " + result);
+                mCamera.setDisplayOrientation(result);
                 mCamera.setParameters(parameters);
                 mCamera.startPreview();
             } catch (Exception e){
@@ -374,7 +409,6 @@ public class NativeCameraFragment extends BaseFragment {
                         case Surface.ROTATION_0:
                             previewWidth = mPreviewSize.height;
                             previewHeight = mPreviewSize.width;
-                            mCamera.setDisplayOrientation(90);
                             break;
                         case Surface.ROTATION_90:
                             previewWidth = mPreviewSize.width;
@@ -387,7 +421,6 @@ public class NativeCameraFragment extends BaseFragment {
                         case Surface.ROTATION_270:
                             previewWidth = mPreviewSize.width;
                             previewHeight = mPreviewSize.height;
-                            mCamera.setDisplayOrientation(180);
                             break;
                     }
                 }
@@ -442,24 +475,43 @@ public class NativeCameraFragment extends BaseFragment {
             File pictureFile = getOutputMediaFile();
             if (pictureFile == null){
                 Toast.makeText(getActivity(), "Image retrieval failed.", Toast.LENGTH_SHORT)
-                        .show();
+                .show();
                 return;
             }
 
+            FileOutputStream fos = null;
             try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
-                fos.close();
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+                Bitmap fullBitmap = BitmapFactory.decodeByteArray(data, 0, data.length, options);
+                Bitmap bmp = Bitmap.createBitmap(fullBitmap);
+                bmp = getRotatedBitMap(bmp, mCameraId == 1 ? -90 : 90);
 
+                fos = new FileOutputStream(pictureFile);
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+
+                ((MainActivity)getActivity()).editPicture(pictureFile, bmp.getWidth(), bmp.getHeight());
                 // Restart the camera preview.
                 safeCameraOpenInView(mCameraView);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                if (fos != null) try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     };
+
+    public static Bitmap getRotatedBitMap(Bitmap bm, int rotation){
+        Matrix matrix = new Matrix();
+        matrix.postRotate(rotation);
+        matrix.postScale(-1,1);
+        return Bitmap.createBitmap(bm, 0,0, bm.getWidth(), bm.getHeight(), matrix, false);
+    }
 
     /**
      * Used to return the camera File output.
@@ -483,25 +535,8 @@ public class NativeCameraFragment extends BaseFragment {
         mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                 "IMG_"+ timeStamp + ".jpg");
 
-        showDialog("Success!", "Your picture has been saved!", getActivity());
+        //DialogHelper.showDialog("Success!", "Your picture has been saved!", getActivity());
 
         return mediaFile;
     }
-
-    public static void showDialog(String title, String message, Context context){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
-        alertDialogBuilder.setTitle(title);
-        alertDialogBuilder
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("Close",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
-
 }

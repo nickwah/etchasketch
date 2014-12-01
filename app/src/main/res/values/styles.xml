@@ -57,4 +57,17 @@
         <item name="android:background">#FF000000</item>
         <item name="android:gravity">right|top</item>
     </style>
+    <!-- Custom GridView Photo Gallery Style -->
+    <style name="GridView.PhotoGallery" parent="android:Widget.GridView">
+        <item name="android:verticalSpacing">10dp</item>
+        <item name="android:horizontalSpacing">10dp</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:numColumns">auto_fit</item>
+        <item name="android:clipToPadding">true</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:stretchMode">columnWidth</item>
+        <item name="android:choiceMode">none</item>
+    </style>
 </resources>
