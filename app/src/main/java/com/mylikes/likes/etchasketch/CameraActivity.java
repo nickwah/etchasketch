@@ -238,126 +238,126 @@ public class CameraActivity extends Activity {
     }
 
     public void layoutUI() {
-		if( MyDebug.LOG )
-			Log.d(TAG, "layoutUI");
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		String ui_placement = sharedPreferences.getString("preference_ui_placement", "ui_right");
-		boolean ui_placement_right = ui_placement.equals("ui_right");
-		if( MyDebug.LOG )
-			Log.d(TAG, "ui_placement: " + ui_placement);
-		// new code for orientation fixed to landscape	
-		// the display orientation should be locked to landscape, but how many degrees is that?
-	    int rotation = this.getWindowManager().getDefaultDisplay().getRotation();
-	    int degrees = 0;
-	    switch (rotation) {
-	    	case Surface.ROTATION_0: degrees = 0; break;
-	        case Surface.ROTATION_90: degrees = 90; break;
-	        case Surface.ROTATION_180: degrees = 180; break;
-	        case Surface.ROTATION_270: degrees = 270; break;
-	    }
-    	int relative_orientation = (current_orientation + degrees) % 360;
-		if( MyDebug.LOG ) {
-			Log.d(TAG, "    current_orientation = " + current_orientation);
-			Log.d(TAG, "    degrees = " + degrees);
-			Log.d(TAG, "    relative_orientation = " + relative_orientation);
-		}
-		int ui_rotation = (360 - relative_orientation) % 360;
-		if (preview != null) preview.setUIRotation(ui_rotation);
-		int align_parent_left = RelativeLayout.ALIGN_PARENT_LEFT;
-		int align_parent_right = RelativeLayout.ALIGN_PARENT_RIGHT;
-		int align_parent_top = RelativeLayout.ALIGN_PARENT_TOP;
-		int align_parent_bottom = RelativeLayout.ALIGN_PARENT_BOTTOM;
-		int margin = (int)(getResources().getDisplayMetrics().density * 10);
-		if( ( relative_orientation == 0 && ui_placement_right ) || ( relative_orientation == 180 && ui_placement_right ) || relative_orientation == 90 || relative_orientation == 270) {
-			if( !ui_placement_right && ( relative_orientation == 90 || relative_orientation == 270 ) ) {
-				align_parent_top = RelativeLayout.ALIGN_PARENT_BOTTOM;
-				align_parent_bottom = RelativeLayout.ALIGN_PARENT_TOP;
-			}
-			
-			View view;
-			RelativeLayout.LayoutParams layoutParams;
+        if( MyDebug.LOG )
+            Log.d(TAG, "layoutUI");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String ui_placement = sharedPreferences.getString("preference_ui_placement", "ui_right");
+        boolean ui_placement_right = ui_placement.equals("ui_right");
+        if( MyDebug.LOG )
+            Log.d(TAG, "ui_placement: " + ui_placement);
+        // new code for orientation fixed to landscape
+        // the display orientation should be locked to landscape, but how many degrees is that?
+        int rotation = this.getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
+        int relative_orientation = (current_orientation + degrees) % 360;
+        if( MyDebug.LOG ) {
+            Log.d(TAG, "    current_orientation = " + current_orientation);
+            Log.d(TAG, "    degrees = " + degrees);
+            Log.d(TAG, "    relative_orientation = " + relative_orientation);
+        }
+        int ui_rotation = (360 - relative_orientation) % 360;
+        if (preview != null) preview.setUIRotation(ui_rotation);
+        int align_parent_left = RelativeLayout.ALIGN_PARENT_LEFT;
+        int align_parent_right = RelativeLayout.ALIGN_PARENT_RIGHT;
+        int align_parent_top = RelativeLayout.ALIGN_PARENT_TOP;
+        int align_parent_bottom = RelativeLayout.ALIGN_PARENT_BOTTOM;
+        int margin = (int)(getResources().getDisplayMetrics().density * 10);
+        if( ( relative_orientation == 0 && ui_placement_right ) || ( relative_orientation == 180 && ui_placement_right ) || relative_orientation == 90 || relative_orientation == 270) {
+            if( !ui_placement_right && ( relative_orientation == 90 || relative_orientation == 270 ) ) {
+                align_parent_top = RelativeLayout.ALIGN_PARENT_BOTTOM;
+                align_parent_bottom = RelativeLayout.ALIGN_PARENT_TOP;
+            }
 
-			view = findViewById(R.id.camera_close);
-			layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
-			layoutParams.addRule(align_parent_top, 0);
-			layoutParams.addRule(align_parent_bottom, RelativeLayout.TRUE);
-			layoutParams.addRule(align_parent_left, RelativeLayout.TRUE);
-			layoutParams.setMargins(margin * 2, margin, margin, margin);
-			view.setLayoutParams(layoutParams);
+            View view;
+            RelativeLayout.LayoutParams layoutParams;
+
+            view = findViewById(R.id.camera_close);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_top, RelativeLayout.TRUE);
+            layoutParams.addRule(align_parent_bottom, 0);
+            layoutParams.addRule(align_parent_left, RelativeLayout.TRUE);
+            layoutParams.setMargins(margin * 2, margin, margin, margin);
+            view.setLayoutParams(layoutParams);
             //no idea what this impacts
             // camera close looks the same at 90 degrees
-			//if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB)view.setRotation(ui_rotation);
+            //if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB)view.setRotation(ui_rotation);
 
-			view = findViewById(R.id.flash);
-			layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
-			layoutParams.addRule(align_parent_top, RelativeLayout.TRUE);
-			layoutParams.addRule(align_parent_bottom, 0);
-			layoutParams.addRule(align_parent_left, RelativeLayout.TRUE);
-			layoutParams.setMargins(margin * 2, margin, margin, margin);
-			view.setLayoutParams(layoutParams);
+            view = findViewById(R.id.flash);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_top, RelativeLayout.TRUE);
+            layoutParams.addRule(align_parent_bottom, 0);
+            layoutParams.addRule(align_parent_right, RelativeLayout.TRUE);
+            layoutParams.setMargins(margin * 2, margin, margin, margin);
+            view.setLayoutParams(layoutParams);
             //no idea what this impacts
             if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB)view.setRotation(ui_rotation);
 
-			view = findViewById(R.id.switch_camera);
-			layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
-			layoutParams.addRule(align_parent_left, RelativeLayout.TRUE);
-			layoutParams.addRule(align_parent_right, 0);
-			layoutParams.addRule(align_parent_top, 0);
-			layoutParams.addRule(align_parent_bottom, 0);
-			layoutParams.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-			layoutParams.setMargins(margin / 2, margin, margin, margin);
-			view.setLayoutParams(layoutParams);
+            view = findViewById(R.id.switch_camera);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_left, 0);
+            layoutParams.addRule(align_parent_right, 0);
+            layoutParams.addRule(align_parent_top, RelativeLayout.TRUE);
+            layoutParams.addRule(align_parent_bottom, 0);
+            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+            layoutParams.setMargins(margin / 2, margin, margin, margin);
+            view.setLayoutParams(layoutParams);
             if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB)view.setRotation(ui_rotation);
 
-			view = findViewById(R.id.take_photo);
-			layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
-			layoutParams.addRule(align_parent_left, 0);
-			layoutParams.addRule(align_parent_right, RelativeLayout.TRUE);
-			layoutParams.setMargins(0, 0, margin, 0);
-			view.setLayoutParams(layoutParams);
+            view = findViewById(R.id.take_photo);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_left, 0);
+            layoutParams.addRule(align_parent_bottom, RelativeLayout.TRUE);
+            layoutParams.setMargins(0, 0, margin, 0);
+            view.setLayoutParams(layoutParams);
             if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB)view.setRotation(ui_rotation);
-		}
-		else {
-			View view;
-			RelativeLayout.LayoutParams layoutParams;
-			view = findViewById(R.id.take_photo);
-			layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
-			layoutParams.addRule(align_parent_left, 0);
-			layoutParams.addRule(align_parent_right, RelativeLayout.TRUE);
-			layoutParams.setMargins(0, 0, 20, 0);
-			view.setLayoutParams(layoutParams);
-            if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB)view.setRotation(ui_rotation);
-			
-			view = findViewById(R.id.camera_close);
-			layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
-			layoutParams.addRule(align_parent_top, 0);
-			layoutParams.addRule(align_parent_bottom, RelativeLayout.TRUE);
-			layoutParams.addRule(align_parent_left, RelativeLayout.TRUE);
-			layoutParams.setMargins(margin * 2, margin, margin, margin);
-			view.setLayoutParams(layoutParams);
+        }
+        else {
+            View view;
+            RelativeLayout.LayoutParams layoutParams;
+            view = findViewById(R.id.take_photo);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_left, 0);
+            layoutParams.addRule(align_parent_bottom, RelativeLayout.TRUE);
+            layoutParams.setMargins(0, 0, 20, 0);
+            view.setLayoutParams(layoutParams);
             if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB)view.setRotation(ui_rotation);
 
-			view = findViewById(R.id.flash);
-			layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
-			layoutParams.addRule(align_parent_top, RelativeLayout.TRUE);
-			layoutParams.addRule(align_parent_bottom, 0);
-			layoutParams.addRule(align_parent_left, RelativeLayout.TRUE);
-			layoutParams.setMargins(margin * 2, margin, margin, margin);
-			view.setLayoutParams(layoutParams);
+            view = findViewById(R.id.camera_close);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_top, RelativeLayout.TRUE);
+            layoutParams.addRule(align_parent_bottom, 0);
+            layoutParams.addRule(align_parent_left, RelativeLayout.TRUE);
+            layoutParams.setMargins(margin * 2, margin, margin, margin);
+            view.setLayoutParams(layoutParams);
             if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB)view.setRotation(ui_rotation);
 
-			view = findViewById(R.id.switch_camera);
-			layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
-			layoutParams.addRule(align_parent_left, RelativeLayout.TRUE);
-			layoutParams.addRule(align_parent_right, 0);
-			layoutParams.addRule(align_parent_top, 0);
-			layoutParams.addRule(align_parent_bottom, 0);
-			layoutParams.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-			layoutParams.setMargins(margin * 2, margin, margin, margin);
-			view.setLayoutParams(layoutParams);
+            view = findViewById(R.id.flash);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_top, RelativeLayout.TRUE);
+            layoutParams.addRule(align_parent_bottom, 0);
+            layoutParams.addRule(align_parent_right, RelativeLayout.TRUE);
+            layoutParams.setMargins(margin * 2, margin, margin, margin);
+            view.setLayoutParams(layoutParams);
             if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB)view.setRotation(ui_rotation);
-		}
-		
+
+            view = findViewById(R.id.switch_camera);
+            layoutParams = (RelativeLayout.LayoutParams)view.getLayoutParams();
+            layoutParams.addRule(align_parent_left, 0);
+            layoutParams.addRule(align_parent_right, 0);
+            layoutParams.addRule(align_parent_top, RelativeLayout.TRUE);
+            layoutParams.addRule(align_parent_bottom, 0);
+            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+            layoutParams.setMargins(margin * 2, margin, margin, margin);
+            view.setLayoutParams(layoutParams);
+            if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB)view.setRotation(ui_rotation);
+        }
+
     }
 
     private void onOrientationChanged(int orientation) {

@@ -22,7 +22,8 @@
         android:src="@drawable/camera_shutter"
         android:background="@color/transparent"
         android:onClick="clickedTakePhoto"
-        android:layout_centerVertical="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         />
 
     <ImageButton
