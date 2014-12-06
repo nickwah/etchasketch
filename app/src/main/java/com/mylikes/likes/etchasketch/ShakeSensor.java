@@ -39,7 +39,7 @@ public class ShakeSensor {
             mAccelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
             float delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta; // perform low-cut filter
-            if (mAccel > 14) {
+            if (mAccel > 12) {
                 Date now = new Date();
                 Log.d(TAG, "current accel: " + mAccel);
                 if (lastHighAccel == null || now.getTime() - lastHighAccel.getTime() > 500) {

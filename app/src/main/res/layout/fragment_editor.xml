@@ -32,4 +32,14 @@
         android:layout_alignParentLeft="true"
         />
 
+    <com.mylikes.likes.etchasketch.views.ArcMenu
+        android:id="@+id/toolmenu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        >
+
+        </com.mylikes.likes.etchasketch.views.ArcMenu>
+
 </RelativeLayout>

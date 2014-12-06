@@ -111,4 +111,34 @@
         <attr name="android:listSelector"/>
 
     </declare-styleable>
+
+    <declare-styleable name="RoundMenuLP">
+        <attr name="android:layout_gravity" />
+        <attr name="corner">
+            <enum name="topleft" value="0" />
+            <enum name="topright" value="1" />
+            <enum name="bottomleft" value="2" />
+            <enum name="bottomright" value="3" />
+        </attr>
+    </declare-styleable>
+
+    <attr name="fromDegrees" format="float|reference" />
+    <attr name="toDegrees" format="float|reference" />
+    <attr name="childSize" format="dimension|reference" />
+
+    <declare-styleable name="ArcLayout">
+        <attr name="fromDegrees"/>
+        <attr name="toDegrees"/>
+        <attr name="childSize"/>
+    </declare-styleable>
+
+    <declare-styleable name="ArcMenu">
+        <attr name="fromDegrees"/>
+        <attr name="toDegrees"/>
+        <attr name="childSize"/>
+    </declare-styleable>
+
+    <declare-styleable name="RayLayout">
+        <attr name="leftHolderWidth" format="dimension" />
+    </declare-styleable>
 </resources>

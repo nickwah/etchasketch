@@ -24,6 +24,7 @@
 
     <color name="transparent">#00000000</color>
     <color name="black">#FF000000</color>
+    <color name="half_transparent_white">#88FFFFFF</color>
 
     <drawable name="actionbar_button_bg">#00000000</drawable>
     <drawable name="actionbar_button_pressed_bg">#60FFFFFF</drawable>

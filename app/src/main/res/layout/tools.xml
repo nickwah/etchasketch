@@ -18,7 +18,7 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:markers="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="@layout/main"
+    tools:showIn="@layout/fragment_editor"
 	android:id="@+id/tools"
     style="@style/ActionBar.Bar"
 	android:orientation="vertical"

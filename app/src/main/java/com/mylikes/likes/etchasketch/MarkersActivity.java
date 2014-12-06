@@ -59,12 +59,14 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mylikes.likes.etchasketch.ToolButton.SwatchButton;
+import com.mylikes.likes.etchasketch.views.ArcMenu;
 
 public class MarkersActivity extends Activity implements ShakeSensor.ShakeListener {
     final static int LOAD_IMAGE = 1000;
@@ -96,8 +98,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     private View mColorsView;
     private View mActionBarView;
     private View mToolsView;
-    private View mComboHudView;
-    
+
     private Dialog mMenuDialog;
 
     private SharedPreferences mPrefs;
@@ -214,6 +215,9 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         }
     }
 
+    private static final int[] ITEM_DRAWABLES = {
+            R.drawable.fountainpen, R.drawable.scribble };
+
     @Override
     public void onCreate(Bundle icicle)
     {
@@ -270,7 +274,6 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         }
 
         mActionBarView = findViewById(R.id.actionbar);
-        mComboHudView = findViewById(R.id.hud);
         mToolsView = findViewById(R.id.tools);
         mColorsView = findViewById(R.id.colors);
         setColors();
@@ -433,6 +436,26 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         });
 
         shakeSensor = new ShakeSensor(this);
+
+        ArcMenu toolMenu = (ArcMenu)findViewById(R.id.toolmenu);
+        initArcMenu(toolMenu, ITEM_DRAWABLES);
+    }
+
+    private void initArcMenu(ArcMenu menu, int[] itemDrawables) {
+        final int itemCount = itemDrawables.length;
+        for (int i = 0; i < itemCount; i++) {
+            ImageView item = new ImageView(this);
+            item.setImageResource(itemDrawables[i]);
+
+            final int position = i;
+            menu.addItem(item, new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(MarkersActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     public Bitmap renderBitmap() {

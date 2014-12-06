@@ -33,7 +33,7 @@
             </intent-filter>
             
         </activity>
-        <activity android:name="com.mylikes.likes.etchasketch.MainActivity" android:label="Camera"
+        <activity android:name="com.mylikes.likes.etchasketch.CameraActivity" android:label="Camera"
             android:theme="@android:style/Theme.NoTitleBar" android:configChanges="orientation|screenSize" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
