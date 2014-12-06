@@ -256,7 +256,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             }
         }
         final ViewGroup root = ((ViewGroup)findViewById(R.id.root));
-        root.addView(mSlate);
+        root.addView(mSlate, 0);
         mZoomView = new ZoomTouchView(this);
         mZoomView.setSlate(mSlate);
         mZoomView.setEnabled(false);
@@ -437,8 +437,8 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
 
         shakeSensor = new ShakeSensor(this);
 
-        ArcMenu toolMenu = (ArcMenu)findViewById(R.id.toolmenu);
-        initArcMenu(toolMenu, ITEM_DRAWABLES);
+        //ArcMenu toolMenu = (ArcMenu)findViewById(R.id.toolmenu);
+        //initArcMenu(toolMenu, ITEM_DRAWABLES);
     }
 
     private void initArcMenu(ArcMenu menu, int[] itemDrawables) {
@@ -456,6 +456,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                 }
             });
         }
+        Log.d(TAG, "Added " + itemCount + " items to arc menu");
     }
 
     public Bitmap renderBitmap() {

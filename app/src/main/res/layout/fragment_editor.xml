@@ -2,6 +2,7 @@
 <RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:markers="http://schemas.android.com/apk/res-auto"
+    xmlns:likes="http://schemas.android.com/apk/res/com.mylikes.likes.etchasketch"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MarkersActivity"
     android:layout_width="match_parent"
@@ -32,6 +33,7 @@
         android:layout_alignParentLeft="true"
         />
 
+    <!--
     <com.mylikes.likes.etchasketch.views.ArcMenu
         android:id="@+id/toolmenu"
         android:layout_width="match_parent"
@@ -41,5 +43,31 @@
         >
 
         </com.mylikes.likes.etchasketch.views.ArcMenu>
+        -->
+    <com.mylikes.likes.etchasketch.RoundMenu
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        likes:mainIcon="@drawable/check"
+        likes:backgroundColor="@color/btn_fg"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/doodlebug"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/paintbrush"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/text_button"
+            />
+
+        </com.mylikes.likes.etchasketch.RoundMenu>
 
 </RelativeLayout>

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.hardware.Sensor;
@@ -31,6 +32,9 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.RelativeLayout;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -52,6 +56,7 @@ public class CameraActivity extends Activity {
 	public boolean start_front = false;
     private boolean paused = false;
 	public Bitmap gallery_bitmap = null;
+    private Bitmap currentPhoto;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -164,7 +169,8 @@ public class CameraActivity extends Activity {
 		return true;
 	}
 
-	public boolean onKeyDown(int keyCode, KeyEvent event) { 
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // TODO: if this is a back button and the phototakenfragment is visible, remove it
 		if( MyDebug.LOG )
 			Log.d(TAG, "onKeyDown: " + keyCode);
         return super.onKeyDown(keyCode, event);
@@ -389,6 +395,47 @@ public class CameraActivity extends Activity {
 		if( MyDebug.LOG )
 			Log.d(TAG, "clickedTakePhoto");
     	this.takePicture();
+    }
+
+    public void setCurrentPhoto(Bitmap bitmap) {
+        currentPhoto = bitmap;
+    }
+
+    public Bitmap getCurrentPhoto() {
+        return currentPhoto;
+    }
+
+    public void onPhotoTaken() {
+        findViewById(R.id.container).setVisibility(View.VISIBLE);
+        PhotoTakenFragment fragment = new PhotoTakenFragment();
+        getFragmentManager().beginTransaction().add(R.id.container, fragment, "phototaken").commit();
+    }
+
+    public void onCancelPreview() {
+        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("phototaken")).commit();
+        findViewById(R.id.container).setVisibility(View.GONE);
+        // TODO: this doesn't seem to clear up the UI correctly for click actions
+    }
+
+    public void onSavePhoto() {
+
+    }
+
+    public void onEditPhoto() {
+        File outputDir = getCacheDir();
+        try {
+            File outputFile = File.createTempFile("cameraedit", "jpg", outputDir);
+            OutputStream fOut = null;
+            fOut = new FileOutputStream(outputFile);
+            currentPhoto.compress(Bitmap.CompressFormat.JPEG, 90, fOut);
+            fOut.flush();
+            fOut.close(); // do not forget to close the stream
+            Intent intent = new Intent(this, MarkersActivity.class);
+            intent.putExtra("picture", outputFile.getPath());
+            startActivity(intent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void clickedSwitchCamera(View view) {

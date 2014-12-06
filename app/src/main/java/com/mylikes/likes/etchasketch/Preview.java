@@ -2524,6 +2524,18 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
     				Log.d(TAG, "onPictureTaken");
 
         		CameraActivity main_activity = (CameraActivity)Preview.this.getContext();
+                Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
+                ///
+                Log.d(TAG, "Rotation: " + ui_rotation);
+                if (ui_rotation == 0) {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
+                }
+                main_activity.setCurrentPhoto(bm);
+                main_activity.onPhotoTaken();
+                showGUI(true); // in case the user comes back here
+                if (true) return;
         		boolean image_capture_intent = false;
        	        Uri image_capture_intent_uri = null;
     	        String action = main_activity.getIntent().getAction();
@@ -3094,51 +3106,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		   	exif.setAttribute(TAG_GPS_IMG_DIRECTION_REF, "M");
     	}
 	}
-
-	public void clickedShare() {
-		if( MyDebug.LOG )
-			Log.d(TAG, "clickedShare");
-		//if( is_preview_paused ) {
-		if( this.phase == PHASE_PREVIEW_PAUSED ) {
-			if( preview_image_name != null ) {
-				if( MyDebug.LOG )
-					Log.d(TAG, "Share: " + preview_image_name);
-				Intent intent = new Intent(Intent.ACTION_SEND);
-				intent.setType("image/jpeg");
-				intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + preview_image_name));
-				Activity activity = (Activity)this.getContext();
-				activity.startActivity(Intent.createChooser(intent, "Photo"));
-			}
-			startCameraPreview();
-			tryAutoFocus(false, false);
-		}
-	}
-
-	public void clickedTrash() {
-		if( MyDebug.LOG )
-			Log.d(TAG, "clickedTrash");
-		//if( is_preview_paused ) {
-		if( this.phase == PHASE_PREVIEW_PAUSED ) {
-			if( preview_image_name != null ) {
-				if( MyDebug.LOG )
-					Log.d(TAG, "Delete: " + preview_image_name);
-				File file = new File(preview_image_name);
-				if( !file.delete() ) {
-					if( MyDebug.LOG )
-						Log.e(TAG, "failed to delete " + preview_image_name);
-				}
-				else {
-					if( MyDebug.LOG )
-						Log.d(TAG, "successfully deleted " + preview_image_name);
-    	    	    showToast(null, "Photo deleted");
-					CameraActivity main_activity = (CameraActivity)this.getContext();
-    	            main_activity.broadcastFile(file);
-				}
-			}
-			startCameraPreview();
-			tryAutoFocus(false, false);
-		}
-    }
 
     private void tryAutoFocus(final boolean startup, final boolean manual) {
     	// manual: whether user has requested autofocus (by touching screen)
