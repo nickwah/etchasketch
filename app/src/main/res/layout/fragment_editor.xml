@@ -2,7 +2,6 @@
 <RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:markers="http://schemas.android.com/apk/res-auto"
-    xmlns:likes="http://schemas.android.com/apk/res/com.mylikes.likes.etchasketch"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MarkersActivity"
     android:layout_width="match_parent"
@@ -33,29 +32,26 @@
         android:layout_alignParentLeft="true"
         />
 
-    <!--
-    <com.mylikes.likes.etchasketch.views.ArcMenu
-        android:id="@+id/toolmenu"
+    <com.mylikes.likes.etchasketch.RoundMenu
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
+        markers:corner="bottomleft"
+        markers:mainIcon="@drawable/check"
+        markers:backgroundColor="@color/btn_fg"
         >
-
-        </com.mylikes.likes.etchasketch.views.ArcMenu>
-        -->
-    <com.mylikes.likes.etchasketch.RoundMenu
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        likes:mainIcon="@drawable/check"
-        likes:backgroundColor="@color/btn_fg"
-        >
-        <ImageView
+        <com.mylikes.likes.etchasketch.RoundSubMenu
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/doodlebug"
+            markers:menuIcon="@drawable/flash_nobg_auto"
+            markers:slideColor="@color/btn_pressed_bg"
+            markers:icon1="@drawable/flash_nobg_off"
+            markers:value1="test"
+            markers:icon2="@drawable/close_x"
+            markers:value2="test2"
+            markers:icon3="@drawable/flash_nobg_on"
+            markers:value3="test"
             />
         <ImageView
             android:layout_width="wrap_content"
