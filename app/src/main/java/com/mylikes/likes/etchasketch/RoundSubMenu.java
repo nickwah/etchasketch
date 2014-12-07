@@ -60,7 +60,7 @@ public class RoundSubMenu extends View {
                 R.styleable.RoundSubMenu,
                 0, 0);
 
-        totalHeight = (int) (SPACER * density);
+        totalHeight = (int) ((SPACER + 30) * density); // TODO: where's this 30 coming from??
         for (int i = 0; i < 5; i++) {
             String value = a.getString(valueIds[i]);
             int resourceId = a.getResourceId(iconIds[i], -1);
@@ -84,6 +84,7 @@ public class RoundSubMenu extends View {
         options.add(bm);
         values.add(value);
         totalHeight += bm.getHeight() + SPACER * density;
+        Log.d(TAG, "totalHegiht =" + totalHeight);
     }
 
     public void setAngle(double angle) {
@@ -185,7 +186,7 @@ public class RoundSubMenu extends View {
         super.onDraw(canvas);
         // TODO: use openPct
 
-        canvas.drawBitmap(image, 40, 0, background);
+        canvas.drawBitmap(image, 0, 0, background);
     }
 
     public void drawChildren(Canvas canvas) {
@@ -194,15 +195,22 @@ public class RoundSubMenu extends View {
             canvas.rotate(angleDgs, getWidth() / 2, getHeight() / 2);
             //Log.d(TAG, "rotate " + Math.round(angleDgs) + "; x=" + getX() + " y=" + getY() + " totalHeight=" + totalHeight);
             //canvas.drawRect(0, -totalHeight, getWidth(), getHeight(), background);
-            RectF r = new RectF(0, openPct * (-totalHeight), getWidth(), getHeight());
+            float padding = 5 * density;
+            RectF r = new RectF(-padding, openPct * (-totalHeight) - padding, getWidth() + 2 * padding, totalHeight + 2 * padding);
             canvas.drawRoundRect(r, 5 * density, 5 * density, background);
             float top = (1.0f - openPct) * totalHeight;
             for (int i = 0; i < options.size(); i++) {
                 top -= options.get(i).getHeight() + SPACER * density;
-                canvas.drawBitmap(options.get(i), getX(), top, background);
+                canvas.drawBitmap(options.get(i), 0, top, background);
             }
+            Log.d(TAG, "total height: " + totalHeight + " top: " + top);
             canvas.restore();
         }
+    }
+
+    public void touchChild(double x, double y) {
+        // Figure out which tool they're touching
+        // x and y are relative to the origin, so x is positive and y is probably negative
     }
 
     protected Animator.AnimatorListener animationEndListener() {
@@ -214,6 +222,7 @@ public class RoundSubMenu extends View {
             @Override
             public void onAnimationEnd(Animator animation) {
                 currentAnimation = null;
+                openPct = expanded ? 1.0f : 0.0f;
                 ((RoundMenu)getParent()).invalidate();
             }
 

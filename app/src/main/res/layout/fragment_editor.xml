@@ -108,20 +108,22 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         markers:corner="bottomleft"
-        markers:mainIcon="@drawable/check"
+        markers:mainIcon="@drawable/icon_paintbrush"
         markers:backgroundColor="@color/btn_fg"
         >
         <com.mylikes.likes.etchasketch.RoundSubMenu
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            markers:menuIcon="@drawable/flash_nobg_auto"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            markers:menuIcon="@drawable/icon_paintbrush"
             markers:slideColor="@color/btn_pressed_bg"
-            markers:icon1="@drawable/flash_nobg_off"
-            markers:value1="test"
-            markers:icon2="@drawable/close_x"
-            markers:value2="test2"
-            markers:icon3="@drawable/flash_nobg_on"
-            markers:value3="test"
+            markers:icon1="@drawable/icon_paintbrush"
+            markers:value1="paintbrush"
+            markers:icon2="@drawable/icon_fountainpen"
+            markers:value2="fountainpen"
+            markers:icon3="@drawable/icon_spraypaint"
+            markers:value3="spraypaint"
+            markers:icon4="@drawable/icon_eraser"
+            markers:value4="eraser"
             />
         <ImageView
             android:layout_width="wrap_content"
@@ -141,7 +143,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        markers:backgroundColor="@color/btn_fg"
+        markers:backgroundColor="@color/default_draw_color"
         markers:corner="bottomright"
         ></com.mylikes.likes.etchasketch.RoundColorMenu>
 

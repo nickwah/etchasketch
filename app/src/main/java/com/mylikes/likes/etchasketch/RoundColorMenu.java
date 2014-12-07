@@ -61,8 +61,8 @@ public class RoundColorMenu extends RoundMenu {
     @Override
     protected void init() {
         wedges = new ArrayList<Wedge>();
-        minRadius = 40;
-        maxRadius = 165;
+        minRadius = 50;
+        maxRadius = 160;
         for (int i = 0; i < colors.length; i++) {
             int color = Color.parseColor(colors[i]);
             float startAngle = 0, sweepAngle = 0;
@@ -108,9 +108,11 @@ public class RoundColorMenu extends RoundMenu {
         }
         //Log.d(TAG, "radius:" + radius + " angle: " + (int)Math.toDegrees(angle));
         if (chosenWedge != null) {
-            background.setColor(chosenWedge.color);
-            ((MarkersActivity)getContext()).setPenColor(chosenWedge.color);
-            invalidate();
+            if (background.getColor() != chosenWedge.color) {
+                background.setColor(chosenWedge.color);
+                ((MarkersActivity) getContext()).setPenColor(chosenWedge.color);
+                invalidate();
+            }
         }
         return null;
     }

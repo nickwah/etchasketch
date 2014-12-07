@@ -470,7 +470,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         mLastPenType = mActivePenType = (ToolButton) mToolsView.findViewWithTag(typeTag);
         if (mActivePenType != null) mActivePenType.click();
 
-        final int color = mPrefs.getInt(PREF_LAST_COLOR, 0xFF000000);
+        final int color = getResources().getColor(R.color.default_draw_color);
         descend((ViewGroup) mColorsView, new ViewFunc() {
             @Override
             public void apply(View v) {
