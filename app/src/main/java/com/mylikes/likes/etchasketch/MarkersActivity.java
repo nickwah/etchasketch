@@ -66,7 +66,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mylikes.likes.etchasketch.ToolButton.SwatchButton;
-import com.mylikes.likes.etchasketch.views.ArcMenu;
 
 public class MarkersActivity extends Activity implements ShakeSensor.ShakeListener {
     final static int LOAD_IMAGE = 1000;
@@ -219,8 +218,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             R.drawable.fountainpen, R.drawable.scribble };
 
     @Override
-    public void onCreate(Bundle icicle)
-    {
+    public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
         final Window win = getWindow();
@@ -229,7 +227,18 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         lp.format = PixelFormat.RGBA_8888;
         win.setBackgroundDrawableResource(R.drawable.transparent);
         win.setAttributes(lp);
-        win.requestFeature(Window.FEATURE_NO_TITLE);
+        //win.requestFeature(Window.FEATURE_NO_TITLE);
+
+        // Hide the status bar.
+        if (Build.VERSION.SDK_INT < 16) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | Window.FEATURE_NO_TITLE,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN | Window.FEATURE_NO_TITLE);
+        } else {
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+            //getActionBar().hide();
+        }
 
         setContentView(R.layout.fragment_editor);
         mSlate = (Slate) getLastNonConfigurationInstance();
@@ -243,7 +252,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(w, h);
             params.addRule(RelativeLayout.RIGHT_OF, R.id.tools);
             params.addRule(RelativeLayout.ABOVE, R.id.colors);
-            params.addRule(RelativeLayout.BELOW, R.id.actionbar);
+            //params.addRule(RelativeLayout.BELOW, R.id.actionbar);
             mSlate.setLayoutParams(params);
 
         	// Load the old buffer if necessary
@@ -273,7 +282,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             onRestoreInstanceState(icicle);
         }
 
-        mActionBarView = findViewById(R.id.actionbar);
+        //mActionBarView = findViewById(R.id.actionbar);
         mToolsView = findViewById(R.id.tools);
         mColorsView = findViewById(R.id.colors);
         setColors();
@@ -289,9 +298,9 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
 
         mDebugButton = findViewById(R.id.debug);
 
-        TextView title = (TextView) mActionBarView.findViewById(R.id.logotype);
-        Typeface light = Typeface.create("sans-serif-light", Typeface.NORMAL);
-        title.setTypeface(light);
+        //TextView title = (TextView) mActionBarView.findViewById(R.id.logotype);
+        //Typeface light = Typeface.create("sans-serif-light", Typeface.NORMAL);
+        //title.setTypeface(light);
 
         final ToolButton.ToolCallback toolCB = new ToolButton.ToolCallback() {
             @Override
@@ -436,27 +445,6 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         });
 
         shakeSensor = new ShakeSensor(this);
-
-        //ArcMenu toolMenu = (ArcMenu)findViewById(R.id.toolmenu);
-        //initArcMenu(toolMenu, ITEM_DRAWABLES);
-    }
-
-    private void initArcMenu(ArcMenu menu, int[] itemDrawables) {
-        final int itemCount = itemDrawables.length;
-        for (int i = 0; i < itemCount; i++) {
-            ImageView item = new ImageView(this);
-            item.setImageResource(itemDrawables[i]);
-
-            final int position = i;
-            menu.addItem(item, new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(MarkersActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-        Log.d(TAG, "Added " + itemCount + " items to arc menu");
     }
 
     public Bitmap renderBitmap() {
@@ -803,35 +791,6 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
 
     public void clickUndo(View unused) {
         mSlate.undo();
-    }
-
-    public void clickAbout(View unused) {
-        hideOverflow();
-        About.show(this);
-    }
-
-    public void clickShareMarketLink(View unused) {
-        hideOverflow();
-        Intent sendIntent = new Intent(Intent.ACTION_SEND);
-        sendIntent.setType("text/plain");
-        sendIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
-        sendIntent.putExtra(Intent.EXTRA_TEXT,
-                "http://play.google.com/store/apps/details?id=" + getPackageName());
-        startActivity(Intent.createChooser(sendIntent, "Share the Markers app with:"));
-    }
-
-    public void clickMarketLink(View unused) {
-        hideOverflow();
-        Intent urlIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("market://details?id=" + getPackageName()));
-        startActivity(urlIntent);
-    }
-
-    public void clickSiteLink(View unused) {
-        hideOverflow();
-        Intent urlIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("http://dsandler.org/markers?from=app"));
-        startActivity(urlIntent);
     }
 
     private void showOverflow() {

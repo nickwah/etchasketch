@@ -30,7 +30,7 @@ import android.view.ViewPropertyAnimator;
 public class RoundMenu extends ViewGroup {
 
     public static final String TAG = "RoundMenu";
-    public static final int minRadius = 40;
+    protected int minRadius = 40;
     protected float radsPerChild;
     protected float density;
     protected int currentRadius, toolRadius = 50;
@@ -40,6 +40,13 @@ public class RoundMenu extends ViewGroup {
     protected Animator currentAnimation;
     protected boolean expanded;
     protected Point origin;
+    public static int CORNER_TOPLEFT = 0;
+    public static int CORNER_TOPRIGHT = 1;
+    public static int CORNER_BOTTOMLEFT = 2;
+    public static int CORNER_BOTTOMRIGHT = 3;
+    public int corner = CORNER_BOTTOMLEFT;
+    protected float animatedFraction;
+    protected int maxRadius = 40;
 
     public RoundMenu(Context context) {
         super(context);
@@ -65,6 +72,7 @@ public class RoundMenu extends ViewGroup {
         if (icon != -1) {
             image = BitmapFactory.decodeResource(getResources(), icon);
         }
+        corner = a.getInt(R.styleable.RoundMenu_corner, corner);
         init();
     }
 
@@ -90,7 +98,8 @@ public class RoundMenu extends ViewGroup {
                     animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
                         public void onAnimationUpdate(ValueAnimator animation) {
-                            currentRadius = (int) (minRadius + 40 * animation.getAnimatedFraction());
+                            animatedFraction = animation.getAnimatedFraction();
+                            currentRadius = (int) (minRadius + maxRadius * animation.getAnimatedFraction());
                             setAlpha(0.5f + animation.getAnimatedFraction() / 2.0f);
                             invalidate();
                         }
@@ -110,7 +119,8 @@ public class RoundMenu extends ViewGroup {
                     animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
                         public void onAnimationUpdate(ValueAnimator animation) {
-                            currentRadius = (int) (minRadius + 40 * (1.0f - animation.getAnimatedFraction()));
+                            animatedFraction = animation.getAnimatedFraction();
+                            currentRadius = (int) (minRadius + maxRadius * (1.0f - animation.getAnimatedFraction()));
                             setAlpha(1.0f - animation.getAnimatedFraction() / 2.0f);
                             invalidate();
                         }
@@ -124,20 +134,8 @@ public class RoundMenu extends ViewGroup {
                     if (x*x + y*y < (minRadius * density) * (minRadius * density)) {
                         // do nothing; touching origin circle
                     } else {
-                        // TODO: adjust this math for each corner
-                        double angle = Math.atan2(y, x) - startAngle;
-                        while (angle < 0) angle += Math.PI * 2;
-                        int child = (int) ((angle) / radsPerChild);
-                        if (child >= 0 && child < getChildCount()) {
-                            View view = getChildAt(child);
-                            if (view instanceof RoundSubMenu) {
-                                expandedChild = (RoundSubMenu)view;
-                                if (!expandedChild.isExpanded()) {
-                                    expandedChild.setAngle(radsPerChild * child + radsPerChild / 2);
-                                    expandedChild.expand();
-                                }
-                            }
-                        }
+                        expandedChild = touchChild(x, y);
+
                         //Log.d(TAG, "Angle: " + Math.round(Math.toDegrees(angle)) + " startAngle: " + Math.round(Math.toDegrees(startAngle)) + " per child: " + Math.round(Math.toDegrees(radsPerChild)) + " child:" + child);
                     }
                     result = true;
@@ -162,6 +160,25 @@ public class RoundMenu extends ViewGroup {
         setAlpha(0.5f);
         // TODO: this depends on corner
         startAngle = Math.PI * 3 / 2;
+    }
+
+    protected RoundSubMenu touchChild(double x, double y) {
+        RoundSubMenu expandedChild = null;
+        // TODO: adjust this math for each corner
+        double angle = Math.atan2(y, x) - startAngle;
+        while (angle < 0) angle += Math.PI * 2;
+        int child = (int) ((angle) / radsPerChild);
+        if (child >= 0 && child < getChildCount()) {
+            View view = getChildAt(child);
+            if (view instanceof RoundSubMenu) {
+                expandedChild = (RoundSubMenu)view;
+                if (!expandedChild.isExpanded()) {
+                    expandedChild.setAngle(radsPerChild * child + radsPerChild / 2);
+                    expandedChild.expand();
+                }
+            }
+        }
+        return expandedChild;
     }
 
     protected Animator.AnimatorListener animationEndListener() {
@@ -227,7 +244,12 @@ public class RoundMenu extends ViewGroup {
         setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
                 resolveSizeAndState(maxHeight, heightMeasureSpec,
                         childState << MEASURED_HEIGHT_STATE_SHIFT));
-        origin = new Point((int)(20 * density), (int)(getHeight() - 20 * density));
+        if (corner == CORNER_BOTTOMLEFT) {
+            origin = new Point((int) (20 * density), (int) (getHeight() - 20 * density));
+        } else if (corner == CORNER_BOTTOMRIGHT) {
+            // TODO: offset by icon size / 2 only if there is an icon
+            origin = new Point((int) (getWidth()), (int) (getHeight()));
+        }
     }
 
     @Override
@@ -283,7 +305,6 @@ public class RoundMenu extends ViewGroup {
                 canvas.restore();
             }
         }
-        // TODO: make the minimum circle size a setting
         canvas.drawCircle(origin.x, origin.y, minRadius * density, background);
         canvas.drawBitmap(image, origin.x - image.getWidth() / 2, origin.y - image.getHeight() / 2, background);
     }
@@ -295,12 +316,7 @@ public class RoundMenu extends ViewGroup {
          */
         public int gravity = Gravity.TOP | Gravity.START;
 
-        public static int CORNER_TOPLEFT = 0;
-        public static int CORNER_TOPRIGHT = 1;
-        public static int CORNER_BOTTOMLEFT = 2;
-        public static int CORNER_BOTTOMRIGHT = 2;
 
-        public int corner = CORNER_BOTTOMLEFT;
 
         public LayoutParams(Context c, AttributeSet attrs) {
             super(c, attrs);
@@ -310,7 +326,6 @@ public class RoundMenu extends ViewGroup {
             // changing the layout behavior in XML.
             TypedArray a = c.obtainStyledAttributes(attrs, R.styleable.RoundMenuLP);
             gravity = a.getInt(R.styleable.RoundMenuLP_android_layout_gravity, gravity);
-            //corner = a.getInt(R.styleable.RoundMenuLP_corner, corner);
             a.recycle();
         }
 

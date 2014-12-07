@@ -38,7 +38,7 @@ public class RoundSubMenu extends View {
 
     protected Animator currentAnimation;
     protected boolean expanded;
-    protected Paint background = new Paint(Color.GRAY);
+    protected Paint background = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     static int[] iconIds = {R.styleable.RoundSubMenu_icon1, R.styleable.RoundSubMenu_icon2, R.styleable.RoundSubMenu_icon3, R.styleable.RoundSubMenu_icon4, R.styleable.RoundSubMenu_icon5};
     static int[] valueIds = {R.styleable.RoundSubMenu_value1, R.styleable.RoundSubMenu_value2, R.styleable.RoundSubMenu_value3, R.styleable.RoundSubMenu_value4, R.styleable.RoundSubMenu_value5};
@@ -95,7 +95,6 @@ public class RoundSubMenu extends View {
     }
 
     public void expand() {
-        Log.d(TAG, "Expand subview");
         expanded = true;
         animateOpenness(openPct, 1, (int)Math.max(options.size() * 50 * (1.0f - openPct), 150));
     }
@@ -119,7 +118,6 @@ public class RoundSubMenu extends View {
     }
 
     public void collapse() {
-        Log.d(TAG, "Collapse subview");
         expanded = false;
         animateOpenness(openPct, 0, (int)Math.max(options.size() * 50 * openPct, 150));
     }

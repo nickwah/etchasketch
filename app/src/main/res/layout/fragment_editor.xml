@@ -10,19 +10,88 @@
     android:background="@color/black"
     >
 
-   	<include layout="@layout/actionbar"
-   	    android:id="@+id/actionbar"
-   		android:layout_width="match_parent"
-   		android:layout_height="@dimen/action_bar_height"
-   		/>
+    <LinearLayout android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        >
+        <ImageButton
+            android:id="@+id/debug"
+            style="@style/ActionBar.Icon"
+            android:src="@drawable/doodlebug"
+            android:contentDescription="debug mode"
+            android:onClick="clickDebug"
+            android:visibility="gone"
+            />
+        <ImageButton
+            android:id="@+id/undo"
+            android:src="@drawable/undo"
+            android:contentDescription="undo"
+            android:onClick="clickUndo"
+            style="@style/ActionBar.Icon"
+            android:alpha="0.5"
+            />
+        <ImageButton
+            android:id="@+id/load"
+            android:src="@drawable/load"
+            android:contentDescription="load image"
+            android:onClick="clickLoad"
+            style="@style/ActionBar.Icon"
+            android:visibility="gone"
+            />
+        <ImageButton
+            android:id="@+id/clear"
+            android:src="@drawable/scribble"
+            android:contentDescription="erase drawing"
+            android:onClick="clickClear"
+            style="@style/ActionBar.Icon"
+            android:alpha="0.5"
+            />
+        <ImageButton
+            android:id="@+id/save"
+            android:src="@drawable/check"
+            android:contentDescription="save drawing"
+            android:onClick="clickSave"
+            style="@style/ActionBar.Icon"
+            android:alpha="0.5"
+            />
+        <ImageButton
+            android:id="@+id/share"
+            android:src="@drawable/share"
+            android:contentDescription="share drawing"
+            android:onClick="clickShare"
+            style="@style/ActionBar.Icon"
+            android:visibility="gone"
+            />
+        <ImageButton
+            android:id="@+id/overflow"
+            android:src="@drawable/overflow"
+            android:contentDescription="more actions"
+            android:onClick="clickOverflow"
+            style="@style/ActionBar.Icon"
+            android:visibility="gone"
+            />
+    </LinearLayout>
 
     <include layout="@layout/colors_horizontal"
         android:id="@+id/colors"
         android:layout_width="match_parent"
         android:layout_height="96dp"
         android:layout_alignParentBottom="true"
+        android:visibility="gone"
         />
 
+    <com.mylikes.likes.etchasketch.SpotSizeBar
+        android:id="@+id/pen_size"
+        android:layout_width="30dp"
+        android:layout_height="100dp"
+        android:progressDrawable="@color/btn_bg"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        />
     <include layout="@layout/tools"
         android:id="@+id/tools"
         android:layout_width="52dp"
@@ -30,6 +99,7 @@
         android:layout_marginTop="@dimen/action_bar_height"
         android:layout_marginBottom="96dp"
         android:layout_alignParentLeft="true"
+        android:visibility="gone"
         />
 
     <com.mylikes.likes.etchasketch.RoundMenu
@@ -65,5 +135,14 @@
             />
 
         </com.mylikes.likes.etchasketch.RoundMenu>
+
+    <com.mylikes.likes.etchasketch.RoundColorMenu
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        markers:backgroundColor="@color/btn_fg"
+        markers:corner="bottomright"
+        ></com.mylikes.likes.etchasketch.RoundColorMenu>
 
 </RelativeLayout>

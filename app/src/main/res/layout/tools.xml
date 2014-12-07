@@ -26,13 +26,6 @@
 	android:layout_height="match_parent"
     android:paddingRight="@dimen/tool_palette_gutter"
 	>
-    <com.mylikes.likes.etchasketch.SpotSizeBar
-        android:id="@+id/pen_size"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
-        android:progressDrawable="@color/btn_bg"
-        />
     <!-- felt tip pen -->
 	<LinearLayout
 	    android:orientation="vertical"

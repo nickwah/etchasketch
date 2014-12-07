@@ -24,7 +24,8 @@
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
 
     <application android:label="@string/app_name" android:icon="@drawable/launcher_icon" android:largeHeap="true" android:hardwareAccelerated="true">
-        <activity android:name="com.mylikes.likes.etchasketch.MarkersActivity" android:label="@string/app_name" android:configChanges="orientation|screenSize" android:screenOrientation="portrait">
+        <activity android:name="com.mylikes.likes.etchasketch.MarkersActivity" android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:configChanges="orientation|screenSize" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.EDIT"/>
                 <action android:name="android.intent.action.SEND"/>
@@ -34,7 +35,7 @@
             
         </activity>
         <activity android:name="com.mylikes.likes.etchasketch.CameraActivity" android:label="Camera"
-            android:theme="@android:style/Theme.NoTitleBar" android:configChanges="orientation|screenSize" android:screenOrientation="portrait">
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:configChanges="orientation|screenSize" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
