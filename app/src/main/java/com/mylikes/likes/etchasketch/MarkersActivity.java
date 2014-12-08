@@ -34,6 +34,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.*;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -124,6 +125,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                             return;
                         }
                         String fn = mDrawingsToScan.removeFirst();
+                        Log.i("telmer","scanning");
                         mMediaScannerConnection.scanFile(fn, "image/png");
                     }
                 }
@@ -446,6 +448,13 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
 
         shakeSensor = new ShakeSensor(this);
 
+        findViewById(R.id.eraser_tool).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPenType(Slate.TYPE_ERASER);
+                ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem)v).image);
+            }
+        });
         findViewById(R.id.paintbrush_tool).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -658,6 +667,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     public boolean loadDrawing(String filename, boolean temporary, boolean absolute) {
         File d = getPicturesDirectory();
         final String filePath;
+        Log.i("telmer","leading");
         if (absolute) {
             filePath = filename;
         } else {
@@ -674,7 +684,8 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             Bitmap bits = BitmapFactory.decodeFile(filePath, opts);
             if (bits != null) {
                 //mSlate.setBitmap(bits); // messes with the bounds
-                mSlate.paintBitmap(bits);
+                mSlate.setBackground(new BitmapDrawable(bits));
+                //mSlate.paintBitmap(bits);
                 return true;
             }
         }
