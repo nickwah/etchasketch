@@ -59,6 +59,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -267,7 +268,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             }
         }
         final ViewGroup root = ((ViewGroup)findViewById(R.id.root));
-        root.addView(mSlate, 0);
+        root.addView(mSlate, 1); //1 because it's after R.id.photo
         mZoomView = new ZoomTouchView(this);
         mZoomView.setSlate(mSlate);
         mZoomView.setEnabled(false);
@@ -433,20 +434,24 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         //mActiveTool.click();
         mActivePenType.click();
 
-        findViewById(R.id.enter_text).setOnClickListener(new View.OnClickListener() {
+        shakeSensor = new ShakeSensor(this);
+
+        findViewById(R.id.text_tool).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mActivePenType.setSelected(false);
-                v.setSelected(true);
                 mSlate.setMoveMode(true);
-                if (firstTextClick) {
-                    Toast.makeText(MarkersActivity.this, "Tap anywhere to start typing", Toast.LENGTH_SHORT).show();
-                    firstTextClick = false;
+                try {
+                    View textInput = findViewById(R.id.text_input);
+                    textInput.setVisibility(View.VISIBLE);
+                    textInput.requestFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
-
-        shakeSensor = new ShakeSensor(this);
 
         findViewById(R.id.eraser_tool).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -459,21 +464,21 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             @Override
             public void onClick(View v) {
                 setPenType(Slate.TYPE_WHITEBOARD);
-                ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem)v).image);
+                ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem) v).image);
             }
         });
         findViewById(R.id.fountainpen_tool).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setPenType(Slate.TYPE_FOUNTAIN_PEN);
-                ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem)v).image);
+                ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem) v).image);
             }
         });
         findViewById(R.id.spraypaint_tool).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setPenType(Slate.TYPE_AIRBRUSH);
-                ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem)v).image);
+                ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem) v).image);
             }
         });
     }
@@ -487,12 +492,8 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     private void loadSettings() {
         mPrefs = getPreferences(MODE_PRIVATE);
 
-        int size = mPrefs.getInt(LAST_PEN_SIZE, -1);
-        if (size == -1) {
-            size = 15;
-        }
-        spotSizeTool.setSize(size);
-        setPenSize(size);
+        spotSizeTool.setSize(60);
+        setPenSize(60);
 
         mLastTool = mActiveTool;
         if (mActiveTool != null) mActiveTool.click();
@@ -526,6 +527,8 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     public void onPause() {
         super.onPause();
         shakeSensor.unregister();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(findViewById(R.id.text_input).getWindowToken(), 0);
         saveDrawing(WIP_FILENAME, true);
     }
 
@@ -557,6 +560,11 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    public void hideTools() {
+        // TODO: we could animate this
+        int tools[] = {R.id.pen_size, R.id.tools_menu, R.id.top_buttons, };
     }
 
     private String dumpBundle(Bundle b) {
@@ -683,8 +691,9 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             opts.inScaled = false;
             Bitmap bits = BitmapFactory.decodeFile(filePath, opts);
             if (bits != null) {
+                ((ImageView)findViewById(R.id.photo)).setImageBitmap(bits);
                 //mSlate.setBitmap(bits); // messes with the bounds
-                mSlate.setBackground(new BitmapDrawable(bits));
+                //mSlate.setBackground(new BitmapDrawable(bits));
                 //mSlate.paintBitmap(bits);
                 return true;
             }
@@ -874,7 +883,6 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     public void setPenType(int type) {
         mSlate.setPenType(type);
         setPenSize(spotSizeTool.getSize());
-        findViewById(R.id.enter_text).setSelected(false);
         mSlate.setMoveMode(false);
     }
     

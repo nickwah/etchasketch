@@ -23,7 +23,7 @@ import android.view.ViewGroup;
 public class RoundMenu extends ViewGroup {
 
     public static final String TAG = "RoundMenu";
-    private final float minAlpha = 0.65f;
+    private final float minAlpha = 0.75f;
     protected int minRadius = 50;
     protected float radsPerChild;
     protected float density;
@@ -137,7 +137,7 @@ public class RoundMenu extends ViewGroup {
                     result = true;
                 } else if (event.getAction() == MotionEvent.ACTION_MOVE && expanded && currentAnimation == null) {
                     double x = event.getX() - origin.x, y = event.getY() - origin.y;
-                    if (x*x + y*y < (minRadius * density) * (minRadius * density)) {
+                    if (x*x + y*y < ((maxRadius - minRadius) * density) * ((maxRadius - minRadius) * density)) {
                         // do nothing; touching origin circle
                     } else {
                         expandedChild = touchChild(x, y);

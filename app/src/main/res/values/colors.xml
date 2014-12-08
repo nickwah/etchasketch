@@ -15,7 +15,7 @@
   limitations under the License.
 -->
 <resources>
-    <color name="btn_bg">#FF222222</color>
+    <color name="btn_bg">#FFD8D8D8</color>
     <color name="btn_pressed_bg">#FFFFCC00</color>
     <color name="btn_selected_bg">#FFFFFFFF</color>
     <color name="btn_fg">#FF555555</color>
@@ -24,7 +24,10 @@
 
     <color name="transparent">#00000000</color>
     <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="offwhite">#FFCCCCCC</color>
     <color name="half_transparent_white">#88FFFFFF</color>
+    <color name="half_transparent_black">#88000000</color>
 
     <color name="default_draw_color">#ffffc94d</color>
 

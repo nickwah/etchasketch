@@ -10,7 +10,15 @@
     android:background="@color/black"
     >
 
+    <ImageView
+        android:id="@+id/photo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        />
+
     <LinearLayout android:orientation="horizontal"
+        android:id="@+id/top_buttons"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_alignParentRight="true"
@@ -102,6 +110,23 @@
         android:visibility="gone"
         />
 
+    <EditText
+        android:id="@+id/text_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="130dp"
+        android:background="@color/half_transparent_black"
+        android:textColor="@color/white"
+        android:padding="10dp"
+        android:gravity="center"
+        android:imeActionLabel="Done"
+        android:imeOptions="actionDone"
+        android:hint="Start Typing Here"
+        android:textColorHint="@color/offwhite"
+        android:visibility="gone"
+        />
+
     <com.mylikes.likes.etchasketch.RoundMenu
         android:id="@+id/tools_menu"
         android:layout_width="match_parent"
@@ -109,8 +134,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         markers:corner="bottomleft"
-        markers:mainIcon="@drawable/icon_paintbrush"
-        markers:backgroundColor="@color/btn_fg"
+        markers:mainIcon="@drawable/main_toolbox"
+        markers:backgroundColor="@color/btn_bg"
         >
         <com.mylikes.likes.etchasketch.RoundMenuItem
             android:id="@+id/paintbrush_tool"
@@ -140,7 +165,7 @@
             android:id="@+id/stickers_tool"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            markers:menuIcon="@drawable/share"
+            markers:menuIcon="@drawable/crown"
             />
         <com.mylikes.likes.etchasketch.RoundMenuItem
             android:id="@+id/text_tool"
