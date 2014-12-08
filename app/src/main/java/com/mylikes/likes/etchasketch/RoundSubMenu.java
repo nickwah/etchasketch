@@ -42,7 +42,7 @@ public class RoundSubMenu extends View {
 
     static int[] iconIds = {R.styleable.RoundSubMenu_icon1, R.styleable.RoundSubMenu_icon2, R.styleable.RoundSubMenu_icon3, R.styleable.RoundSubMenu_icon4, R.styleable.RoundSubMenu_icon5};
     static int[] valueIds = {R.styleable.RoundSubMenu_value1, R.styleable.RoundSubMenu_value2, R.styleable.RoundSubMenu_value3, R.styleable.RoundSubMenu_value4, R.styleable.RoundSubMenu_value5};
-    private float openPct = 0;
+    protected float openPct = 0;
 
     public RoundSubMenu(Context context) {
         super(context);
@@ -91,7 +91,7 @@ public class RoundSubMenu extends View {
         this.angleDgs = (float)Math.toDegrees(angle);
     }
 
-    private void init() {
+    protected void init() {
         density = getResources().getDisplayMetrics().density;
     }
 
@@ -211,6 +211,12 @@ public class RoundSubMenu extends View {
     public void touchChild(double x, double y) {
         // Figure out which tool they're touching
         // x and y are relative to the origin, so x is positive and y is probably negative
+        // rotate it back by angle
+        double rads = -Math.toRadians(angleDgs);
+        double x2 = x * Math.cos(rads) - y * Math.sin(rads);
+        double y2 = y * Math.cos(rads) + x * Math.sin(rads);
+        y2 += ((RoundMenu)getParent()).maxRadius * density;
+        //Log.d(TAG, "x=" + x + " y=" + y + " x2=" + x2 + " y2=" + y2);
     }
 
     protected Animator.AnimatorListener animationEndListener() {

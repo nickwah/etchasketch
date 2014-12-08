@@ -445,6 +445,28 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         });
 
         shakeSensor = new ShakeSensor(this);
+
+        findViewById(R.id.paintbrush_tool).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPenType(Slate.TYPE_WHITEBOARD);
+                ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem)v).image);
+            }
+        });
+        findViewById(R.id.fountainpen_tool).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPenType(Slate.TYPE_FOUNTAIN_PEN);
+                ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem)v).image);
+            }
+        });
+        findViewById(R.id.spraypaint_tool).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPenType(Slate.TYPE_AIRBRUSH);
+                ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem)v).image);
+            }
+        });
     }
 
     public Bitmap renderBitmap() {

@@ -27,7 +27,7 @@ public class RoundMenu extends ViewGroup {
     protected int minRadius = 50;
     protected float radsPerChild;
     protected float density;
-    protected int currentRadius, toolRadius = 50;
+    protected int currentRadius, toolRadius = 100;
     protected Bitmap image;
     protected final Paint background = new Paint(Paint.ANTI_ALIAS_FLAG);
     protected double startAngle = 0;
@@ -40,7 +40,7 @@ public class RoundMenu extends ViewGroup {
     public static int CORNER_BOTTOMRIGHT = 3;
     public int corner = CORNER_BOTTOMLEFT;
     protected float animatedFraction;
-    protected int maxRadius = 60;
+    protected int maxRadius = 120;
 
     public RoundMenu(Context context) {
         super(context);
@@ -146,14 +146,12 @@ public class RoundMenu extends ViewGroup {
                     }
                     result = true;
                 }
-                if (expandedChild == null) {
-                    for (int i = 0; i < getChildCount(); i++) {
-                        View view = getChildAt(i);
-                        if (view instanceof RoundSubMenu) {
-                            RoundSubMenu subMenu = (RoundSubMenu)view;
-                            if (subMenu.isExpanded()) {
-                                subMenu.collapse();
-                            }
+                for (int i = 0; i < getChildCount(); i++) {
+                    View view = getChildAt(i);
+                    if (view instanceof RoundSubMenu) {
+                        RoundSubMenu subMenu = (RoundSubMenu)view;
+                        if (subMenu.isExpanded() && subMenu != expandedChild) {
+                            subMenu.collapse();
                         }
                     }
                 }
@@ -166,6 +164,11 @@ public class RoundMenu extends ViewGroup {
         setAlpha(minAlpha);
         // TODO: this depends on corner
         startAngle = Math.PI * 3 / 2;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
+        invalidate();
     }
 
     protected RoundSubMenu touchChild(double x, double y) {

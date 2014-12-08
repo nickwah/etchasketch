@@ -103,6 +103,7 @@
         />
 
     <com.mylikes.likes.etchasketch.RoundMenu
+        android:id="@+id/tools_menu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
@@ -111,29 +112,41 @@
         markers:mainIcon="@drawable/icon_paintbrush"
         markers:backgroundColor="@color/btn_fg"
         >
-        <com.mylikes.likes.etchasketch.RoundSubMenu
+        <com.mylikes.likes.etchasketch.RoundMenuItem
+            android:id="@+id/paintbrush_tool"
             android:layout_width="30dp"
             android:layout_height="30dp"
             markers:menuIcon="@drawable/icon_paintbrush"
-            markers:slideColor="@color/btn_pressed_bg"
-            markers:icon1="@drawable/icon_paintbrush"
-            markers:value1="paintbrush"
-            markers:icon2="@drawable/icon_fountainpen"
-            markers:value2="fountainpen"
-            markers:icon3="@drawable/icon_spraypaint"
-            markers:value3="spraypaint"
-            markers:icon4="@drawable/icon_eraser"
-            markers:value4="eraser"
             />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/paintbrush"
+        <com.mylikes.likes.etchasketch.RoundMenuItem
+            android:id="@+id/fountainpen_tool"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            markers:menuIcon="@drawable/icon_fountainpen"
             />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/text_button"
+        <com.mylikes.likes.etchasketch.RoundMenuItem
+            android:id="@+id/spraypaint_tool"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            markers:menuIcon="@drawable/icon_spraypaint"
+            />
+        <com.mylikes.likes.etchasketch.RoundMenuItem
+            android:id="@+id/eraser_tool"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            markers:menuIcon="@drawable/icon_eraser"
+            />
+        <com.mylikes.likes.etchasketch.RoundMenuItem
+            android:id="@+id/stickers_tool"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            markers:menuIcon="@drawable/share"
+            />
+        <com.mylikes.likes.etchasketch.RoundMenuItem
+            android:id="@+id/text_tool"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            markers:menuIcon="@drawable/text_button"
             />
 
         </com.mylikes.likes.etchasketch.RoundMenu>
