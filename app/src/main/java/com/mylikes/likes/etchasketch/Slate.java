@@ -81,6 +81,7 @@ public class Slate extends View {
     public static final int TYPE_FELTTIP = 1;
     public static final int TYPE_AIRBRUSH = 2;
     public static final int TYPE_FOUNTAIN_PEN = 3;
+    public static final int TYPE_ERASER = 4;
     
     public static final int SHAPE_CIRCLE = 0;
     public static final int SHAPE_SQUARE = 1;
@@ -245,8 +246,14 @@ public class Slate extends View {
         }
 
         public void setPenColor(int color) {
+            if (mPenColor == Color.TRANSPARENT && mPenType == TYPE_ERASER) {
+                return;
+            }
             mPenColor = color;
-            if (color == 0) {
+            if  (color == Color.TRANSPARENT) {
+                mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+                mPaint.setColor(color);
+            } else if (color == 0) {
                 // eraser: DST_OUT
                 mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
                 mPaint.setColor(Color.BLACK);
@@ -285,8 +292,16 @@ public class Slate extends View {
                 mShape = SHAPE_FOUNTAIN_PEN;
                 mInkDensity = 0xff;
                 break;
+            case TYPE_ERASER:
+                mShape = SHAPE_CIRCLE;
+                mInkDensity = 0xff;
+
             }
-            setPenColor(mPenColor);
+            if (type == TYPE_ERASER) {
+                setPenColor(Color.TRANSPARENT);
+            } else {
+                setPenColor(mPenColor);
+            }
         }
         
         public int getPenType() {
