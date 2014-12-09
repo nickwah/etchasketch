@@ -1379,7 +1379,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
     		if( MyDebug.LOG )
     			Log.d(TAG, "display_size: " + display_size.x + " x " + display_size.y);
         }
-        double targetRatio = getTargetRatio(display_size);
+        double targetRatio = 1.0 / getTargetRatio(display_size);
         int targetHeight = Math.min(display_size.y, display_size.x);
         if( targetHeight <= 0 ) {
             targetHeight = display_size.y;
