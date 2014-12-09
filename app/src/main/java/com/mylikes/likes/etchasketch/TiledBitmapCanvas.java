@@ -396,7 +396,7 @@ public class TiledBitmapCanvas implements CanvasLite {
             mBottomVersion++;
         }
         mVersionInUse = false;
-        if (DEBUG_TILES_ON_COMMIT) {
+        if (DEBUG_TILES_ON_COMMIT || true) {
             Log.v(TAG, "commit: next=" + mNewVersion + " top=" + (mNewVersion-1) + " bot=" + mBottomVersion);
             for (int i=0; i<mTiles.length; i++) {
                 final Tile tile = mTiles[i];
@@ -411,12 +411,12 @@ public class TiledBitmapCanvas implements CanvasLite {
 
     public void step(int delta) {
         final int oldTop = mVersionInUse ? mNewVersion : mNewVersion-1;
-        int newTop = oldTop + delta;       // step
+        int newTop = oldTop + delta;  // step
         if (newTop < mBottomVersion) {
             if (newTop == mBottomVersion) return; // we're already at the end
             newTop = mBottomVersion;
         }
-        if (mDebug) {
+        if (mDebug || true) {
             Log.v(TAG, String.format("step(%d): oldTop=%d newTop=%d bot=%d", delta, 
                     oldTop, newTop, mBottomVersion));
         }
