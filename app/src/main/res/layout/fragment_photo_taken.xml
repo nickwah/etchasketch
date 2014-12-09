@@ -11,33 +11,36 @@
         android:scaleType="centerInside"
         />
 
-    <Button
+    <ImageButton
         android:id="@+id/photo_cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_margin="10dp"
-        android:text="Cancel"
+        android:src="@drawable/cancel"
+        android:background="@color/transparent"
         />
 
-    <Button
+    <ImageButton
         android:id="@+id/photo_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"
-        android:text="Save"
+        android:src="@drawable/done"
+        android:background="@color/transparent"
         />
-    <Button
+    <ImageButton
         android:id="@+id/photo_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"
-        android:text="Edit"
+        android:src="@drawable/tools"
+        android:background="@color/transparent"
         />
 
 </RelativeLayout>
