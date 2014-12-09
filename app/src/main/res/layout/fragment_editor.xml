@@ -254,7 +254,7 @@
         android:id="@+id/sticker_chooser"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="240dp"
+        android:layout_height="190dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -264,8 +264,24 @@
             android:id="@+id/sticker_items"
             android:layout_width="3000dp"
             android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+        <LinearLayout
+            android:id="@+id/sticker_items_top"
+            android:layout_width="3000dp"
+            android:layout_height="80dp"
             android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             ></LinearLayout>
+        <LinearLayout
+            android:id="@+id/sticker_items_bottom"
+            android:layout_width="3000dp"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            ></LinearLayout>
+        </LinearLayout>
         </HorizontalScrollView>
 
 </RelativeLayout>

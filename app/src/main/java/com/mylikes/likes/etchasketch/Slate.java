@@ -17,6 +17,7 @@
 package com.mylikes.likes.etchasketch;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -128,6 +129,7 @@ public class Slate extends View {
 
     private ArrayList<MoveableDrawing> overlays = new ArrayList<MoveableDrawing>();
     private boolean moveMode = false;
+    private boolean inStickerChooser = true;
     private int moveDrawingIndex;
     private float moveDrawingStartX, moveDrawingStartY;
     private long touchStartTime;
@@ -725,6 +727,12 @@ public class Slate extends View {
         invalidate();
     }
 
+    public void addSticker(StickerDrawing stick){
+        overlays.add(stick);
+        selectedDrawing = stick;
+        invalidate();
+    }
+
     public void addText(int x, int y, String text) {
         TextDrawing drawing = new TextDrawing(getContext(), text, x, y);
         drawing.setColor(currentColor);
@@ -1040,6 +1048,10 @@ public class Slate extends View {
     public void setMoveMode(boolean moveMode) {
         this.moveMode = moveMode;
         invalidate();
+    }
+
+    public void setInStickerChooser(boolean x){
+        this.inStickerChooser = x;
     }
 
     public void removeMoveable() {

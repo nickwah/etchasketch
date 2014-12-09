@@ -192,9 +192,10 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         InputStream istr;
         Bitmap bitmap = null;
         try {
-            istr = assetManager.open(filePath);
+            istr = assetManager.open("stickers/"+filePath);
             bitmap = BitmapFactory.decodeStream(istr);
         } catch (IOException e) {
+            e.printStackTrace();
             // handle exception
         }
 
@@ -332,13 +333,32 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
 
         //add stickers
         sticker_assets = new ArrayList<Bitmap>();
-        LinearLayout list = (LinearLayout) findViewById(R.id.sticker_items);
+        LinearLayout list_top = (LinearLayout) findViewById(R.id.sticker_items_top);
+        LinearLayout list_bottom = (LinearLayout) findViewById(R.id.sticker_items_bottom);
+        boolean top = true;
         for (String filename: stickers){
-            Bitmap b = getBitmapFromAsset(this,filename);
+            final Bitmap b = getBitmapFromAsset(this,filename);
             sticker_assets.add(b);
             ImageView item = new ImageView(this);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams((int) (getResources().getDisplayMetrics().density * 80),(int)(getResources().getDisplayMetrics().density * 80));
+            item.setLayoutParams(layoutParams);
             item.setImageBitmap(b);
-            list.addView(item);
+            //TODO:this
+            item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    StickerDrawing stick = new StickerDrawing(MarkersActivity.this,b,500,500);
+                    mSlate.addSticker(stick);
+                    mSlate.setMoveMode(true);
+                    findViewById(R.id.sticker_chooser).setVisibility(View.GONE);
+                }
+            });
+            if (top){
+                list_top.addView(item);
+            } else {
+                list_bottom.addView(item);
+            }
+            top = !top;
         }
 
         //TextView title = (TextView) mActionBarView.findViewById(R.id.logotype);
@@ -554,6 +574,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             public void onClick(View v) {
                 //setPenType(Slate.TYPE_ERASER);
                 findViewById(R.id.sticker_chooser).setVisibility(View.VISIBLE);
+                mSlate.setMoveMode(true);
             }
         });
         findViewById(R.id.eraser_tool).setOnClickListener(new View.OnClickListener() {
@@ -738,6 +759,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     protected void onRestoreInstanceState(Bundle icicle) {
     }
 
+    //TODO: for stickers
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
