@@ -78,7 +78,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     public static final String IMAGE_SAVE_DIRNAME = "Drawings";
     public static final String IMAGE_TEMP_DIRNAME = IMAGE_SAVE_DIRNAME + "/.temporary";
     public static final String WIP_FILENAME = "temporary.png";
-    
+
     public static final String PREF_LAST_TOOL = "tool";
     public static final String PREF_LAST_TOOL_TYPE = "tool_type";
     public static final String PREF_LAST_COLOR = "color";
@@ -111,14 +111,14 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
 
     protected MediaScannerConnection mMediaScannerConnection;
     private String mPendingShareFile;
-    private MediaScannerConnectionClient mMediaScannerClient = 
+    private MediaScannerConnectionClient mMediaScannerClient =
             new MediaScannerConnection.MediaScannerConnectionClient() {
                 @Override
                 public void onMediaScannerConnected() {
                     if (DEBUG) Log.v(TAG, "media scanner connected");
                     scanNext();
                 }
-                
+
                 private void scanNext() {
                     synchronized (mDrawingsToScan) {
                         if (mDrawingsToScan.isEmpty()) {
@@ -130,7 +130,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                         mMediaScannerConnection.scanFile(fn, "image/png");
                     }
                 }
-        
+
                 @Override
                 public void onScanCompleted(String path, Uri uri) {
                     if (DEBUG) Log.v(TAG, "File scanned: " + path);
@@ -158,7 +158,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         public ColorList(Context c, AttributeSet as) {
             super(c, as);
         }
-        
+
         @Override
         protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
             super.onLayout(changed, left, top, right, bottom);
@@ -179,7 +179,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     	((ViewGroup)mSlate.getParent()).removeView(mSlate);
         return mSlate;
     }
-    
+
     public static interface ViewFunc {
         public void apply(View v);
     }
@@ -276,11 +276,11 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             mZoomView.setAlpha(0);
         }
         root.addView(mZoomView, 0);
-        
+
         mMediaScannerConnection =
                 new MediaScannerConnection(MarkersActivity.this, mMediaScannerClient);
 
-        
+
         if (icicle != null) {
             onRestoreInstanceState(icicle);
         }
@@ -313,7 +313,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                 setPenSize((min + max) / 2.0f);
                 mLastTool = mActiveTool;
                 mActiveTool = tool;
-                
+
                 if (mLastTool != mActiveTool) {
                     mLastTool.deactivate();
                     mPrefs.edit().putString(PREF_LAST_TOOL, (String) mActiveTool.getTag())
@@ -367,7 +367,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                 mZoomView.setEnabled(true);
                 mLastTool = mActiveTool;
                 mActiveTool = me;
-                
+
                 if (mLastTool != mActiveTool) {
                     mLastTool.deactivate();
                     mPrefs.edit().putString(PREF_LAST_TOOL, (String) mActiveTool.getTag())
@@ -380,7 +380,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                 mSlate.resetZoom();
             }
         };
-        
+
         descend((ViewGroup) mColorsView, new ViewFunc() {
             @Override
             public void apply(View v) {
@@ -416,17 +416,17 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         if (typeFeltTipButton != null) {
             typeFeltTipButton.setCallback(toolCB);
         }
-        
+
         final ToolButton typeAirbrushButton = (ToolButton) findViewById(R.id.airbrush_marker);
         if (typeAirbrushButton != null) {
             typeAirbrushButton.setCallback(toolCB);
         }
-        
+
         final ToolButton typeFountainPenButton = (ToolButton) findViewById(R.id.fountainpen_marker);
         if (typeFountainPenButton != null) {
             typeFountainPenButton.setCallback(toolCB);
         }
-        
+
         mLastPenType = mActivePenType = typeWhiteboardButton;
 
         loadSettings();
@@ -539,7 +539,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         shakeSensor.register();
         shakeSensor.setShakeListener(this);
         String orientation = getString(R.string.orientation);
-        
+
         setRequestedOrientation(
                 "landscape".equals(orientation)
                     ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -580,7 +580,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         sb.append("}");
         return sb.toString();
     }
-    
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -683,7 +683,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             filePath = new File(d, filename).toString();
         }
         if (DEBUG) Log.d(TAG, "loadDrawing: " + filePath);
-        
+
         if (d.exists()) {
             BitmapFactory.Options opts = new BitmapFactory.Options();
             opts.inDither = false;
@@ -715,7 +715,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             if (DEBUG) Log.e(TAG, "save: null bitmap");
             return;
         }
-        
+
         final String _filename = filename;
         final boolean _temporary = temporary;
         final boolean _share = share;
@@ -746,14 +746,14 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                     localBits.compress(Bitmap.CompressFormat.PNG, 0, os);
                     localBits.recycle();
                     os.close();
-                    
+
                     fn = file.toString();
                 } catch (IOException e) {
                     Log.e(TAG, "save: error: " + e);
                 }
                 return fn;
             }
-            
+
             @Override
             protected void onPostExecute(String fn) {
                 if (fn != null) {
@@ -771,14 +771,14 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                 if (_clear) mSlate.clear();
             }
         }.execute();
-        
+
     }
 
     public void clickSave(View v) {
         if (mSlate.isEmpty()) return;
-        
+
         v.setEnabled(false);
-        final String filename = System.currentTimeMillis() + ".png"; 
+        final String filename = System.currentTimeMillis() + ".png";
         saveDrawing(filename);
         Toast.makeText(this, "Drawing saved: " + filename, Toast.LENGTH_SHORT).show();
         v.setEnabled(true);
@@ -788,8 +788,8 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         if (mSlate.isEmpty()) return;
 
         v.setEnabled(false);
-        final String filename = System.currentTimeMillis() + ".png"; 
-        saveDrawing(filename, 
+        final String filename = System.currentTimeMillis() + ".png";
+        saveDrawing(filename,
                 /*temporary=*/ false, /*animate=*/ true, /*share=*/ false, /*clear=*/ true);
         Toast.makeText(this, "Drawing saved: " + filename, Toast.LENGTH_SHORT).show();
         v.setEnabled(true);
@@ -817,12 +817,12 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         hideOverflow();
         Intent i = new Intent(Intent.ACTION_PICK,
                        android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-        startActivityForResult(i, LOAD_IMAGE); 
+        startActivityForResult(i, LOAD_IMAGE);
     }
 
     public void clickDebug(View unused) {
         hideOverflow();
-        boolean debugMode = (mSlate.getDebugFlags() == 0); // toggle 
+        boolean debugMode = (mSlate.getDebugFlags() == 0); // toggle
         mSlate.setDebugFlags(debugMode
             ? Slate.FLAG_DEBUG_EVERYTHING
             : 0);
@@ -845,12 +845,12 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         if (mMenuDialog == null) {
             LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
             View layout = inflater.inflate(R.layout.overflow_menu, null);
-    
+
     //        TextView text = (TextView) layout.findViewById(R.id.text);
     //        text.setText("Hello, this is a custom dialog!");
     //        ImageView image = (ImageView) layout.findViewById(R.id.image);
     //        image.setImageResource(R.drawable.android);
-    
+
             mMenuDialog = new Dialog(this);
             //mMenuDialog = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK).create();
             Window dialogWin  = mMenuDialog.getWindow();
@@ -863,7 +863,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             dialogWin.setAttributes(winParams);
             dialogWin.setWindowAnimations(android.R.style.Animation_Translucent);
             dialogWin.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-            mMenuDialog.setCanceledOnTouchOutside(true); 
+            mMenuDialog.setCanceledOnTouchOutside(true);
 
             mMenuDialog.setContentView(layout);
             // bash the background
@@ -879,18 +879,19 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     public void setPenColor(int color) {
         mSlate.setPenColor(color);
     }
-    
+
     public void setPenType(int type) {
         mSlate.setPenType(type);
-        setPenSize(spotSizeTool.getSize());
+        //setPenSize(spotSizeTool.getSize()); //Wrong set Size method
+        findViewById(R.id.enter_text).setSelected(false);
         mSlate.setMoveMode(false);
     }
-    
+
     protected void loadImageFromIntent(Intent imageReturnedIntent) {
         Uri contentUri = imageReturnedIntent.getData();
         loadImageFromContentUri(contentUri);
     }
-    
+
     protected void loadImageFromContentUri(Uri contentUri) {
         Toast.makeText(this, "Loading from " + contentUri, Toast.LENGTH_SHORT).show();
 
@@ -912,10 +913,10 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         }
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) { 
-        super.onActivityResult(requestCode, resultCode, imageReturnedIntent); 
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
-        switch (requestCode) { 
+        switch (requestCode) {
         case LOAD_IMAGE:
             if (resultCode == RESULT_OK) {
                 loadImageFromIntent(imageReturnedIntent);

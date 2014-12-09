@@ -246,13 +246,13 @@ public class Slate extends View {
         }
 
         public void setPenColor(int color) {
-            if (mPenColor == Color.TRANSPARENT && mPenType == TYPE_ERASER) {
+            if (mPaint.getColor() == Color.TRANSPARENT && mPenType == TYPE_ERASER) {
                 return;
             }
-            mPenColor = color;
             if  (color == Color.TRANSPARENT) {
                 mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
                 mPaint.setColor(color);
+                return;//don't set mPenColor
             } else if (color == 0) {
                 // eraser: DST_OUT
                 mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
@@ -267,6 +267,7 @@ public class Slate extends View {
 //                mPaint.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
                 mPaint.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP));
             }
+            mPenColor = color;
         }
 
         public int getPenColor() {

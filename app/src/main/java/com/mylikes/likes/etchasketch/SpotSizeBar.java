@@ -3,11 +3,13 @@ package com.mylikes.likes.etchasketch;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.widget.SeekBar;
+import android.util.Log;
 
 import com.mylikes.likes.etchasketch.R;
 
@@ -106,6 +108,10 @@ public class SpotSizeBar extends SeekBar {
         final boolean vertical = true;
 
         float scale = getWidth() / (float)getMax() / 2.5f / density;
+        float width = 15;
+        float border_width = 5;
+        float bar_width = 25;
+        float bar_height = 13;
 
         float r1 = getMin() * scale * density;
         float r2 = getMax() * scale * density;
@@ -117,22 +123,22 @@ public class SpotSizeBar extends SeekBar {
 
         final float start = (vertical ? getPaddingTop() : getPaddingLeft()) + r1 + 1 * density;
         final float end = getHeight() - r2 - 5 * density;
-        final float iter = 1f / (vertical ? getHeight() : getWidth());
 
-        for (float f = 0f; f < 1.0f; f += iter) {
-            final float y = Slate.lerp(start, end, f) + 2 * density;
-            final float x = center;
-            final float r = Slate.lerp(r1, r2, (float) Math.pow(f, 1.6));
-            c.drawCircle(vertical ? x : y, vertical ? y : x, r, mPaint);
-        }
-        c.drawCircle(vertical ? center : end, vertical ? end : center, r2, mPaint);
+        mPaint.setColor(Color.BLACK);
+        c.drawRect(center - width,start, center + width, end,mPaint);
+        mPaint.setColor(Color.WHITE);
+        c.drawRect(center-width + border_width,start+border_width,center+width-border_width,end-border_width,mPaint);
+        //c.drawCircle(vertical ? center : end, vertical ? end : center, r2, mPaint);
 
         float progress = getProgress() / (float)smoothness;
         int size = getSize();
         mPaint.setColor(isSelected() ? 0xffffffff : 0xffcccccc);
-        c.drawCircle(center,
-                progress / (float)(getMax() - getMin()) * (getHeight() - center - 4 * density),
-                (float) (Math.max(size, 5)) * scale * 1.1f * density, mPaint);
+        //c.drawCircle(center,
+                //progress / (float)(getMax() - getMin()) * (getHeight() - center - 4 * density),
+                /*(float) (Math.max(size, 5)) * scale * 1.1f * density*///10, mPaint);
+        float off = progress / (float)(getMax() - getMin()) * (getHeight() - center - 4 * density);
+        float ycenter = start + off;
+        c.drawRect(center - bar_width,ycenter - bar_height,center + bar_width, ycenter + bar_height,mPaint);
     }
 
     public int getSize() {
