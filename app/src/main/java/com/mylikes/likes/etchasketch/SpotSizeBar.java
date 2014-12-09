@@ -125,9 +125,8 @@ public class SpotSizeBar extends SeekBar {
         final float start = (vertical ? getPaddingTop() : getPaddingLeft()) + r1 + 1 * density;
         final float end = getHeight() - r2 - 5 * density;
 
-        mPaint.setColor(Color.BLACK);
-        c.drawRect(center - width,start, center + width, end,mPaint);
-        mPaint.setColor(Color.WHITE);
+        
+        mPaint.setColor(0xff33a2d7);
         c.drawRect(center-width + border_width,start+border_width,center+width-border_width,end-border_width,mPaint);
         //c.drawCircle(vertical ? center : end, vertical ? end : center, r2, mPaint);
 
