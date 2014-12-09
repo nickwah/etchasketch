@@ -175,6 +175,13 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         }
     }
 
+    public static String[] stickers = {
+         "heart_1.png", "crown_1.png", "dog_cocktail.png", "doughnut_1.png", "cat_eyes.png", "sleepymoon.png",
+            "grin_russel.png", "stars_1.png", "cat_grumpy.png", "witch_hat.png", "pickle-burger.png", "corgi_crown.png", "wand.png", "dog_ball.png",
+            "dog_pilot.png", "cat_acrobat.png", "stars_2.png", "ballons_1.png", "ballons_2.png", "cat_walk.png",
+            "beaker.png", "panda.png", "heart_suit.png", "grad_cap.png", "batty.png"
+    };
+
     @Override
     public Object onRetainNonConfigurationInstance() {
     	((ViewGroup)mSlate.getParent()).removeView(mSlate);
