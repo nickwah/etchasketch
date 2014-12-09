@@ -221,6 +221,8 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     private static final int[] ITEM_DRAWABLES = {
             R.drawable.fountainpen, R.drawable.scribble };
 
+
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -611,8 +613,8 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
 
         setRequestedOrientation(
                 "landscape".equals(orientation)
-                    ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                        : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     @Override
@@ -702,6 +704,28 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                 return true;
             }
             // TODO: exit the editor
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Do you want to ditch your creation?")
+                    .setPositiveButton("Leave", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+
+                            finish();
+                        }
+                            /*mSlate.clear();
+                            if (getIntent().hasExtra("picture")) {
+                                loadDrawing(getIntent().getStringExtra("picture"));
+                            }*/
+
+                    })
+                    .setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Nothing
+                        }
+                    });
+            builder.create().show();
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -766,7 +790,6 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     public boolean loadDrawing(String filename, boolean temporary, boolean absolute) {
         File d = getPicturesDirectory();
         final String filePath;
-        Log.i("telmer","leading");
         if (absolute) {
             filePath = filename;
         } else {

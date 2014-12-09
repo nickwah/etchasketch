@@ -173,6 +173,13 @@ public class CameraActivity extends Activity {
         // TODO: if this is a back button and the phototakenfragment is visible, remove it
 		if( MyDebug.LOG )
 			Log.d(TAG, "onKeyDown: " + keyCode);
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            View photoTakenFragment = findViewById(R.id.photo_preview);
+            if (photoTakenFragment.getVisibility() == View.VISIBLE) {
+                onCancelPreview();
+            }
+            return true;
+        }
         return super.onKeyDown(keyCode, event);
     }
 
@@ -412,9 +419,12 @@ public class CameraActivity extends Activity {
     }
 
     public void onCancelPreview() {
-        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("phototaken")).commit();
-        findViewById(R.id.container).setVisibility(View.GONE);
-        // TODO: this doesn't seem to clear up the UI correctly for click actions
+        //getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("phototaken")).commit();
+        //findViewById(R.id.container).setVisibility(View.GONE);
+        Intent intent = new Intent(this, CameraActivity.class);
+        startActivity(intent);
+        finish();
+        overridePendingTransition(0,0);
     }
 
     public void onSavePhoto() {
@@ -618,6 +628,7 @@ public class CameraActivity extends Activity {
     public static String getDonateLink() {
     	return "https://play.google.com/store/apps/details?id=harman.mark.donation";
     }
+
 
     /*public static String getDonateMarketLink() {
     	return "market://details?id=harman.mark.donation";

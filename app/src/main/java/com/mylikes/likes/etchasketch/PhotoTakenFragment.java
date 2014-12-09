@@ -7,7 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
+import android.view.KeyEvent;
+import android.app.Activity;
+import android.util.Log;
 /**
  * Created by nick on 12/6/14.
  */
@@ -23,6 +25,7 @@ public class PhotoTakenFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ((CameraActivity)getActivity()).onCancelPreview();
+
             }
         });
         view.findViewById(R.id.photo_save).setOnClickListener(new View.OnClickListener() {
@@ -39,4 +42,6 @@ public class PhotoTakenFragment extends Fragment {
         });
         return view;
     }
+
+
 }
