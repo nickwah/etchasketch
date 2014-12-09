@@ -485,6 +485,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                 input.setText("");
                 input.setVisibility(View.GONE);
                 input.clearFocus();
+                mSlate.removeMoveable();
                 showTools();
             }
         });

@@ -30,6 +30,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -38,6 +39,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.os.Build;
+import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -133,6 +135,8 @@ public class Slate extends View {
     private String resizeDrawingCorner;
     private MoveableDrawing selectedDrawing = null;
     private int currentColor;
+    private PointF firstFinger;
+    private PointF secondFinger;
 
     public interface SlateListener {
         void strokeStarted();
@@ -732,7 +736,7 @@ public class Slate extends View {
 
     public void renderDrawing() {
         if (selectedDrawing != null) {
-            Bitmap bm = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+            Bitmap bm = Bitmap.createBitmap((int) (getWidth() * getDrawingDensity()), (int) (getHeight() * getDrawingDensity()), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bm);
             selectedDrawing.renderInto(canvas, false);
             paintBitmap(bm);
@@ -1065,39 +1069,38 @@ public class Slate extends View {
             return false;
         }
 
+        int pointerIndex = MotionEventCompat.getActionIndex(event);
+        int pointerId = event.getPointerId(pointerIndex);
         if (moveMode) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-                touchStartTime = System.currentTimeMillis();
-                moveDrawingStartX = event.getX();
-                moveDrawingStartY = event.getY();
-                int i = 0;
-                selectedDrawing = null;
-                moveDrawingIndex = -1;
-                resizeDrawingIndex = -1;
-                resizeDrawingCorner = null;
-                for (MoveableDrawing drawing : overlays) {
-                    String corner = drawing.closestCorner((int)moveDrawingStartX, (int)moveDrawingStartY);
-                    if (corner != null) {
-                        selectedDrawing = drawing;
-                        if (corner.startsWith("b")) {
-                            resizeDrawingIndex = i;
-                        }
-                        resizeDrawingCorner = corner;
-                        break;
+                if (firstFinger != null) {
+                    secondFinger = new PointF(event.getX(pointerIndex), event.getY(pointerIndex));
+                } else {
+                    touchStartTime = System.currentTimeMillis();
+                    moveDrawingStartX = event.getX();
+                    moveDrawingStartY = event.getY();
+                    int i = 0;
+                    moveDrawingIndex = -1;
+                    resizeDrawingIndex = -1;
+                    resizeDrawingCorner = null;
+                    if (selectedDrawing != null) {
+                        moveDrawingIndex = 0;
                     }
-                    if (drawing.contains((int)moveDrawingStartX, (int)moveDrawingStartY)) {
-                        selectedDrawing = drawing;
-                        moveDrawingIndex = i;
-                        break;
+                    if (i >= overlays.size()) {
+                        return true;
                     }
-                    i++;
+                    Log.d(TAG, "Start dragging overlay");
+                    firstFinger = new PointF(event.getX(), event.getY());
                 }
-                if (i >= overlays.size()) {
-                    return true;
-                }
-                Log.d(TAG, "Start dragging overlay");
                 return true;
             } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
+                if (secondFinger != null) {
+                    secondFinger = null;
+                    return true;
+                }
+                if (firstFinger != null) {
+                    firstFinger = null;
+                }
                 if (moveDrawingIndex == -1 && resizeDrawingIndex == -1 && System.currentTimeMillis() - touchStartTime < 400 && Math.abs(event.getX() - moveDrawingStartX) + Math.abs(event.getY() - moveDrawingStartY) < 8) {
                     if (resizeDrawingCorner != null && selectedDrawing != null) {
                         if (resizeDrawingCorner == "tl" && selectedDrawing instanceof TextDrawing) {
@@ -1113,10 +1116,13 @@ public class Slate extends View {
                 Log.d(TAG, "Stop dragging overlay");
                 // TODO: add to undo stack
                 return true;
+            } else if (firstFinger != null && secondFinger != null && action == MotionEvent.ACTION_MOVE) {
+                MotionEvent.PointerCoords coords = new MotionEvent.PointerCoords();
+                event.getPointerCoords(1, coords);
             } else if (moveDrawingIndex >= 0 && moveDrawingIndex < overlays.size() && action == MotionEvent.ACTION_MOVE) {
                 float x = event.getX();
                 float y = event.getY();
-                overlays.get(moveDrawingIndex).moveBy((int)(x - moveDrawingStartX), (int)(y - moveDrawingStartY));
+                overlays.get(moveDrawingIndex).moveBy((int)((x - moveDrawingStartX) * getDrawingDensity()), (int)((y - moveDrawingStartY) * getDrawingDensity()));
                 // TODO: only invalidate relevant Rect
                 invalidate();
                 moveDrawingStartX = x;
