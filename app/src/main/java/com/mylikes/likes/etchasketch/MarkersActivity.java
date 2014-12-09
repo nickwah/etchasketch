@@ -807,6 +807,8 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             Bitmap bits = BitmapFactory.decodeFile(filePath, opts);
             if (bits != null) {
                 ((ImageView)findViewById(R.id.photo)).setImageBitmap(bits);
+                mSlate.paintBitmap(Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888));//Undo won't undo first action
+                //mSlate.commitStroke();
                 //mSlate.setBitmap(bits); // messes with the bounds
                 //mSlate.setBackground(new BitmapDrawable(bits));
                 //mSlate.paintBitmap(bits);
