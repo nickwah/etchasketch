@@ -242,4 +242,30 @@
             />
     </LinearLayout>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerVertical="true"
+        android:layout_alignRight="@+id/pen_size"
+        android:layout_alignEnd="@+id/pen_size"></LinearLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/sticker_chooser"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@color/offwhite"
+        android:visibility="gone">
+        <LinearLayout
+            android:id="@+id/sticker_items"
+            android:layout_width="3000dp"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            ></LinearLayout>
+        </HorizontalScrollView>
+
 </RelativeLayout>

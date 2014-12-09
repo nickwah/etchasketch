@@ -19,7 +19,9 @@ package com.mylikes.likes.etchasketch;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -32,6 +34,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
@@ -147,6 +150,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                     }
                 }
             };
+    private ArrayList<Bitmap> sticker_assets;
 
 
     @Override
@@ -181,6 +185,21 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             "dog_pilot.png", "cat_acrobat.png", "stars_2.png", "ballons_1.png", "ballons_2.png", "cat_walk.png",
             "beaker.png", "panda.png", "heart_suit.png", "grad_cap.png", "batty.png"
     };
+
+    public static Bitmap getBitmapFromAsset(Context context, String filePath) {
+        AssetManager assetManager = context.getAssets();
+
+        InputStream istr;
+        Bitmap bitmap = null;
+        try {
+            istr = assetManager.open(filePath);
+            bitmap = BitmapFactory.decodeStream(istr);
+        } catch (IOException e) {
+            // handle exception
+        }
+
+        return bitmap;
+    }
 
     @Override
     public Object onRetainNonConfigurationInstance() {
@@ -310,6 +329,17 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         });
 
         mDebugButton = findViewById(R.id.debug);
+
+        //add stickers
+        sticker_assets = new ArrayList<Bitmap>();
+        LinearLayout list = (LinearLayout) findViewById(R.id.sticker_items);
+        for (String filename: stickers){
+            Bitmap b = getBitmapFromAsset(this,filename);
+            sticker_assets.add(b);
+            ImageView item = new ImageView(this);
+            item.setImageBitmap(b);
+            list.addView(item);
+        }
 
         //TextView title = (TextView) mActionBarView.findViewById(R.id.logotype);
         //Typeface light = Typeface.create("sans-serif-light", Typeface.NORMAL);
@@ -518,6 +548,14 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             }
         });
 
+
+        findViewById(R.id.stickers_tool).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //setPenType(Slate.TYPE_ERASER);
+                findViewById(R.id.sticker_chooser).setVisibility(View.VISIBLE);
+            }
+        });
         findViewById(R.id.eraser_tool).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -814,7 +852,7 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
             Bitmap bits = BitmapFactory.decodeFile(filePath, opts);
             if (bits != null) {
                 ((ImageView)findViewById(R.id.photo)).setImageBitmap(bits);
-                mSlate.paintBitmap(Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888));//Undo won't undo first action
+                mSlate.paintBitmap(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));//Undo won't undo first action
                 //mSlate.commitStroke();
                 //mSlate.setBitmap(bits); // messes with the bounds
                 //mSlate.setBackground(new BitmapDrawable(bits));
