@@ -19,7 +19,7 @@
 
     <LinearLayout android:orientation="horizontal"
         android:id="@+id/top_buttons"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_width="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
@@ -38,7 +38,7 @@
             android:contentDescription="undo"
             android:onClick="clickUndo"
             style="@style/ActionBar.Icon"
-            android:alpha="0.5"
+            android:alpha="0.75"
             />
         <ImageButton
             android:id="@+id/load"
@@ -50,19 +50,19 @@
             />
         <ImageButton
             android:id="@+id/clear"
-            android:src="@drawable/scribble"
+            android:src="@drawable/clear"
             android:contentDescription="erase drawing"
             android:onClick="clickClear"
             style="@style/ActionBar.Icon"
-            android:alpha="0.5"
+            android:alpha="0.75"
             />
         <ImageButton
             android:id="@+id/save"
-            android:src="@drawable/check"
+            android:src="@drawable/done"
             android:contentDescription="save drawing"
             android:onClick="clickSave"
             style="@style/ActionBar.Icon"
-            android:alpha="0.5"
+            android:alpha="0.75"
             />
         <ImageButton
             android:id="@+id/share"
@@ -120,10 +120,34 @@
         android:textColor="@color/white"
         android:padding="10dp"
         android:gravity="center"
-        android:imeActionLabel="Done"
-        android:imeOptions="actionDone"
         android:hint="Start Typing Here"
         android:textColorHint="@color/offwhite"
+        android:imeOptions="actionDone"
+        android:singleLine="true"
+        android:visibility="gone"
+        />
+    
+    <ImageButton
+        android:id="@+id/text_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="250dp"
+        android:background="@color/transparent"
+        android:src="@drawable/cancel"
+        android:visibility="gone"
+        />
+
+    <ImageButton
+        android:id="@+id/text_done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="250dp"
+        android:background="@color/transparent"
+        android:src="@drawable/done"
         android:visibility="gone"
         />
 
@@ -171,12 +195,13 @@
             android:id="@+id/text_tool"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            markers:menuIcon="@drawable/text_button"
+            markers:menuIcon="@drawable/text"
             />
 
         </com.mylikes.likes.etchasketch.RoundMenu>
 
     <com.mylikes.likes.etchasketch.RoundColorMenu
+        android:id="@+id/colors_menu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
@@ -184,5 +209,37 @@
         markers:backgroundColor="@color/default_draw_color"
         markers:corner="bottomright"
         ></com.mylikes.likes.etchasketch.RoundColorMenu>
+    
+    <LinearLayout
+        android:id="@+id/edit_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        >
+        <ImageButton
+            android:id="@+id/edit_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/cancel"
+            android:background="@color/transparent"
+            android:scaleType="centerInside"
+            android:padding="10dp"
+            />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            />
+        <ImageButton
+            android:id="@+id/edit_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/done"
+            android:background="@color/transparent"
+            android:scaleType="centerInside"
+            android:padding="10dp"
+            />
+    </LinearLayout>
 
 </RelativeLayout>

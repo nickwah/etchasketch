@@ -104,10 +104,10 @@ public abstract class MoveableDrawing {
         canvas.drawLine(left, bottom, right, bottom, borderColor);
         canvas.drawLine(left, top, left, bottom, borderColor);
         canvas.drawCircle(left, top, RADIUS, fillColor);
-        //canvas.drawCircle(right, top, RADIUS, fillColor);
-        //canvas.drawCircle(right, bottom, RADIUS, fillColor);
+        canvas.drawCircle(right, top, RADIUS, fillColor);
+        canvas.drawCircle(right, bottom, RADIUS, fillColor);
         canvas.drawCircle(left, bottom, RADIUS, fillColor);
-        canvas.drawBitmap(closeIcon, right - closeIcon.getWidth() / 2, top - closeIcon.getHeight() / 2, fillColor);
-        canvas.drawBitmap(resizeIcon, right - resizeIcon.getWidth() / 2, bottom - resizeIcon.getHeight() / 2, fillColor);
+        //canvas.drawBitmap(closeIcon, right - closeIcon.getWidth() / 2, top - closeIcon.getHeight() / 2, fillColor);
+        //canvas.drawBitmap(resizeIcon, right - resizeIcon.getWidth() / 2, bottom - resizeIcon.getHeight() / 2, fillColor);
     }
 }

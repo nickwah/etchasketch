@@ -730,6 +730,16 @@ public class Slate extends View {
         // TODO: add to undo stack
     }
 
+    public void renderDrawing() {
+        if (selectedDrawing != null) {
+            Bitmap bm = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bm);
+            selectedDrawing.renderInto(canvas, false);
+            paintBitmap(bm);
+            removeMoveable();
+        }
+    }
+
     public void promptForText(final int x, final int y) {
         promptForText(x, y, null);
     }
@@ -778,28 +788,10 @@ public class Slate extends View {
     }
 
     public void maybeRemoveDrawing(final MoveableDrawing drawing) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                getContext());
-        alertDialogBuilder.setTitle("Delete this?");
-        alertDialogBuilder
-                .setCancelable(false)
-                .setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                overlays.remove(drawing);
-                                // TODO: add to undo stack
-                                if (selectedDrawing == drawing) selectedDrawing = null;
-                                invalidate();
-                            }
-                        })
-                .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-        alertDialogBuilder.create().show();
+        overlays.remove(drawing);
+        // TODO: add to undo stack
+        if (selectedDrawing == drawing) selectedDrawing = null;
+        invalidate();
     }
 
 
@@ -1046,6 +1038,12 @@ public class Slate extends View {
         invalidate();
     }
 
+    public void removeMoveable() {
+        if (selectedDrawing != null) {
+            maybeRemoveDrawing(selectedDrawing);
+        }
+    }
+
     @SuppressLint("NewApi")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -1103,12 +1101,12 @@ public class Slate extends View {
                 if (moveDrawingIndex == -1 && resizeDrawingIndex == -1 && System.currentTimeMillis() - touchStartTime < 400 && Math.abs(event.getX() - moveDrawingStartX) + Math.abs(event.getY() - moveDrawingStartY) < 8) {
                     if (resizeDrawingCorner != null && selectedDrawing != null) {
                         if (resizeDrawingCorner == "tl" && selectedDrawing instanceof TextDrawing) {
-                            promptForText((TextDrawing)selectedDrawing);
+                            //promptForText((TextDrawing)selectedDrawing);
                         } else if (resizeDrawingCorner == "tr") {
-                            maybeRemoveDrawing(selectedDrawing);
+                            //maybeRemoveDrawing(selectedDrawing);
                         }
                     } else {
-                        promptForText((int) event.getX(), (int) event.getY());
+                        //promptForText((int) event.getX(), (int) event.getY());
                     }
                 }
                 moveDrawingIndex = -1;

@@ -23,7 +23,7 @@ public class TextDrawing extends MoveableDrawing {
         fontCache = new HashMap<String, Typeface>(6);
     }
     private String text, font = "Overlock-Regular.ttf";
-    private float fontSize = 80.0f;
+    private float fontSize = 40.0f;
     private final Paint paint = new Paint();
 
     public TextDrawing(Context context, String text, int x, int y) {
@@ -45,6 +45,15 @@ public class TextDrawing extends MoveableDrawing {
         height = bounds.height();
     }
 
+    public static int measureWidth(String text, float fontSize, Context context) {
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setTextSize(fontSize);
+        paint.setTypeface(getTypeface("Overlock-Regular.ttf", context));
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        return bounds.width();
+    }
+
     public void setText(String text) {
         this.text = text;
         measure(text);
@@ -58,11 +67,15 @@ public class TextDrawing extends MoveableDrawing {
     }
 
     private Typeface getFont() {
-        if (fontCache.containsKey(font)) {
-            return fontCache.get(font);
+        return getTypeface(font, context);
+    }
+
+    public static Typeface getTypeface(String fontName, Context context) {
+        if (fontCache.containsKey(fontName)) {
+            return fontCache.get(fontName);
         }
-        Typeface face = Typeface.createFromAsset(context.getAssets(), "fonts/" + font);
-        fontCache.put(font, face);
+        Typeface face = Typeface.createFromAsset(context.getAssets(), "fonts/" + fontName);
+        fontCache.put(fontName, face);
         return face;
     }
 
@@ -108,6 +121,6 @@ public class TextDrawing extends MoveableDrawing {
         super.renderBorders(canvas);
         float left = x - threshold, right = x + width + threshold;
         float top = y - threshold, bottom = y + height + threshold;
-        canvas.drawBitmap(editIcon, left - editIcon.getWidth() / 2, top - editIcon.getHeight() / 2, fillColor);
+        //canvas.drawBitmap(editIcon, left - editIcon.getWidth() / 2, top - editIcon.getHeight() / 2, fillColor);
     }
 }

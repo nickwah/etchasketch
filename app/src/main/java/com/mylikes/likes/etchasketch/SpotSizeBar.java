@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -104,7 +105,7 @@ public class SpotSizeBar extends SeekBar {
 
     protected void onDraw(Canvas c) {
 
-        mPaint.setColor(mFgColor.getColorForState(getDrawableState(), mFgColor.getDefaultColor()));
+        mPaint.setColor(getResources().getColor(R.color.btn_fg));
         final boolean vertical = true;
 
         float scale = getWidth() / (float)getMax() / 2.5f / density;
@@ -138,7 +139,8 @@ public class SpotSizeBar extends SeekBar {
                 /*(float) (Math.max(size, 5)) * scale * 1.1f * density*///10, mPaint);
         float off = progress / (float)(getMax() - getMin()) * (getHeight() - center - 4 * density);
         float ycenter = start + off;
-        c.drawRect(center - bar_width,ycenter - bar_height,center + bar_width, ycenter + bar_height,mPaint);
+        RectF r = new RectF(center - bar_width, ycenter - bar_height, center + bar_width, ycenter + bar_height);
+        c.drawRoundRect(r, 3 * density, 3 * density, mPaint);
     }
 
     public int getSize() {

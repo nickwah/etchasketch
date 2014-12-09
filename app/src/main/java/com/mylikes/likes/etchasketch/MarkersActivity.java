@@ -59,6 +59,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -447,9 +448,63 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                     getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                    hideTools();
+                    /*
+                    findViewById(R.id.text_done).setVisibility(View.VISIBLE);
+                    findViewById(R.id.text_cancel).setVisibility(View.VISIBLE);
+                    */
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        });
+        EditText input = (EditText) findViewById(R.id.text_input);
+        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                int result = actionId & EditorInfo.IME_MASK_ACTION;
+                switch(result) {
+                    case EditorInfo.IME_ACTION_DONE:
+                        // done stuff
+                        editTextDone();
+                        break;
+                    case EditorInfo.IME_ACTION_NEXT:
+                        // next stuff
+                        break;
+                }
+                return false;
+            }
+        });
+        findViewById(R.id.text_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText input = (EditText) findViewById(R.id.text_input);
+                input.setText("");
+                input.setVisibility(View.GONE);
+                input.clearFocus();
+                showTools();
+            }
+        });
+        findViewById(R.id.text_done).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editTextDone();
+            }
+        });
+
+        findViewById(R.id.edit_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSlate.removeMoveable();
+                showTools();
+            }
+        });
+        findViewById(R.id.edit_done).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSlate.renderDrawing();
+                showTools();
             }
         });
 
@@ -481,6 +536,20 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
                 ((RoundMenu)findViewById(R.id.tools_menu)).setImage(((RoundMenuItem) v).image);
             }
         });
+    }
+
+    private void editTextDone() {
+        EditText input = (EditText) findViewById(R.id.text_input);
+        String text = input.getText().toString();
+        int width = TextDrawing.measureWidth(text, 20.0f * getResources().getDisplayMetrics().density, this);
+        input.setText("");
+        input.clearFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(findViewById(R.id.text_input).getWindowToken(), 0);
+        input.setVisibility(View.GONE);
+        mSlate.addText((mSlate.getWidth()) / 2, (int) (260 * getResources().getDisplayMetrics().density), text);
+        mSlate.setMoveMode(true);
+        findViewById(R.id.edit_buttons).setVisibility(View.VISIBLE);
     }
 
     public Bitmap renderBitmap() {
@@ -562,9 +631,23 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
         super.onStop();
     }
 
+    private static int tools[] = {R.id.pen_size, R.id.tools_menu, R.id.top_buttons, R.id.colors_menu};
     public void hideTools() {
         // TODO: we could animate this
-        int tools[] = {R.id.pen_size, R.id.tools_menu, R.id.top_buttons, };
+        for (int tool_id: tools) {
+            findViewById(tool_id).setVisibility(View.GONE);
+        }
+    }
+    public void showTools() {
+        // TODO: we could animate this
+        for (int tool_id: tools) {
+            findViewById(tool_id).setVisibility(View.VISIBLE);
+        }
+        findViewById(R.id.text_done).setVisibility(View.GONE);
+        findViewById(R.id.text_cancel).setVisibility(View.GONE);
+        findViewById(R.id.edit_buttons).setVisibility(View.GONE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(findViewById(R.id.text_input).getWindowToken(), 0);
     }
 
     private String dumpBundle(Bundle b) {
@@ -610,6 +693,14 @@ public class MarkersActivity extends Activity implements ShakeSensor.ShakeListen
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
+            EditText input = (EditText)findViewById(R.id.text_input);
+            if (input.getVisibility() == View.VISIBLE) {
+                input.setText("");
+                input.setVisibility(View.GONE);
+                input.clearFocus();
+                showTools();
+                return true;
+            }
             // TODO: exit the editor
             return true;
         }

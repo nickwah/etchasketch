@@ -90,6 +90,7 @@ public class RoundColorMenu extends RoundMenu {
         }
         corner = CORNER_BOTTOMRIGHT;
         super.init();
+        touchChildRadius = minRadius;
     }
 
     @Override
