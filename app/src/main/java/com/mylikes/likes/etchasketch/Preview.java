@@ -2529,7 +2529,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
                 Log.d(TAG, "Rotation: " + ui_rotation);
                 if (ui_rotation == 0) {
                     Matrix matrix = new Matrix();
-                    matrix.postRotate(90);
+                    matrix.postRotate(cameraId == 0 ? 90: -90);
                     bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
                 }
                 main_activity.setCurrentPhoto(bm);

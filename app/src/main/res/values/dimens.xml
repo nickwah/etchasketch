@@ -30,5 +30,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="photo_height">120dp</dimen>
     <dimen name="photo_width">120dp</dimen>
-    <dimen name="default_font_size">40sp</dimen>
+    <dimen name="default_font_size">60sp</dimen>
 </resources>

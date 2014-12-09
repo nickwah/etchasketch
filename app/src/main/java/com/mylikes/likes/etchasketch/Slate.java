@@ -1074,7 +1074,13 @@ public class Slate extends View {
         if (moveMode) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 if (firstFinger != null) {
-                    secondFinger = new PointF(event.getX(pointerIndex), event.getY(pointerIndex));
+                    MotionEvent.PointerCoords coords1 = new MotionEvent.PointerCoords();
+                    event.getPointerCoords(0, coords1);
+                    Log.d(TAG, "coords1: " + coords1.x + " " + coords1.y);
+                    MotionEvent.PointerCoords coords2 = new MotionEvent.PointerCoords();
+                    event.getPointerCoords(1, coords2);
+                    firstFinger.set(coords1.x, coords1.y);
+                    secondFinger = new PointF(coords2.x, coords2.y);
                 } else {
                     touchStartTime = System.currentTimeMillis();
                     moveDrawingStartX = event.getX();
@@ -1096,6 +1102,10 @@ public class Slate extends View {
             } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
                 if (secondFinger != null) {
                     secondFinger = null;
+                    MotionEvent.PointerCoords coords1 = new MotionEvent.PointerCoords();
+                    event.getPointerCoords(0, coords1);
+                    moveDrawingStartX = coords1.x;
+                    moveDrawingStartY = coords1.y;
                     return true;
                 }
                 if (firstFinger != null) {
@@ -1117,8 +1127,35 @@ public class Slate extends View {
                 // TODO: add to undo stack
                 return true;
             } else if (firstFinger != null && secondFinger != null && action == MotionEvent.ACTION_MOVE) {
-                MotionEvent.PointerCoords coords = new MotionEvent.PointerCoords();
-                event.getPointerCoords(1, coords);
+                MotionEvent.PointerCoords coords1 = new MotionEvent.PointerCoords();
+                event.getPointerCoords(0, coords1);
+                Log.d(TAG, "coords1: " + coords1.x + " " + coords1.y);
+                MotionEvent.PointerCoords coords2 = new MotionEvent.PointerCoords();
+                event.getPointerCoords(1, coords2);
+                Log.d(TAG, "coords2: " + coords2.x + " " + coords2.y);
+                float xDist = firstFinger.x - secondFinger.x, yDist = firstFinger.y - secondFinger.y;
+                float origAngle = (float)Math.atan2(yDist, xDist);
+                if (origAngle < 0) origAngle += Math.PI * 2;
+                float lastDistance = (float) Math.sqrt(xDist * xDist + yDist * yDist);
+
+                xDist = coords2.x - coords1.x;
+                yDist = coords2.y - coords1.y;
+                float newDistance = (float) Math.sqrt(xDist * xDist + yDist * yDist);
+                float newAngle = (float)Math.atan2(yDist, xDist);
+                if (newAngle < 0) newAngle += Math.PI * 2;
+                if (newAngle - origAngle > Math.PI / 2) {
+                    origAngle += Math.PI;
+                } else if (origAngle - newAngle > Math.PI / 2) {
+                    newAngle += Math.PI;
+                }
+
+                firstFinger.set(coords1.x, coords1.y);
+                secondFinger = new PointF(coords2.x, coords2.y);
+                if (selectedDrawing != null) {
+                    selectedDrawing.resizeBy(newDistance / lastDistance);
+                    selectedDrawing.rotateBy(newAngle - origAngle);
+                    invalidate();
+                }
             } else if (moveDrawingIndex >= 0 && moveDrawingIndex < overlays.size() && action == MotionEvent.ACTION_MOVE) {
                 float x = event.getX();
                 float y = event.getY();

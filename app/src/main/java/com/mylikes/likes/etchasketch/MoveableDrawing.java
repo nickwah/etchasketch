@@ -23,6 +23,7 @@ public abstract class MoveableDrawing {
     protected static Bitmap closeIcon;
     protected static Bitmap resizeIcon;
     protected static Bitmap editIcon;
+    protected float rotation;
 
     public MoveableDrawing(Context context, int x, int y) {
         this.context = context;
@@ -67,6 +68,19 @@ public abstract class MoveableDrawing {
         width = Math.max(10, width + x);
     }
 
+    public void resizeBy(float amount) {
+        int oldWidth = width;
+        width *= amount;
+        this.x += (oldWidth - width);
+        int oldHeight = height;
+        height *= amount;
+        this.y += (oldHeight - height);
+    }
+
+    public void rotateBy(float rads) {
+        rotation += rads;
+    }
+
     public boolean contains(int x, int y) {
         Log.d(TAG, "x=" + x + " y=" + y);
         return (this.x < x && this.x + width > x) && (this.y < y && this.y + height > y);
@@ -97,8 +111,8 @@ public abstract class MoveableDrawing {
     public abstract void renderInto(Canvas canvas, boolean showBorders);
 
     public void renderBorders(Canvas canvas) {
-        float left = x - threshold, right = x + width + threshold;
-        float top = y - threshold, bottom = y + height + threshold;
+        float left = - threshold, right = width + threshold;
+        float top = - threshold, bottom = height + threshold;
         canvas.drawLine(left, top, right, top, borderColor);
         canvas.drawLine(right, top, right, bottom, borderColor);
         canvas.drawLine(left, bottom, right, bottom, borderColor);

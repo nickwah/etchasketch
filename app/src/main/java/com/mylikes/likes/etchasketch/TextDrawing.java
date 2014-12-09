@@ -23,7 +23,7 @@ public class TextDrawing extends MoveableDrawing {
         fontCache = new HashMap<String, Typeface>(6);
     }
     private String text, font = "Overlock-Regular.ttf";
-    private float fontSize = 40.0f;
+    private float fontSize = 60.0f;
     private final Paint paint = new Paint();
 
     public TextDrawing(Context context, String text, int x, int y) {
@@ -111,9 +111,28 @@ public class TextDrawing extends MoveableDrawing {
         width = newWidth;
     }
 
+    public void resizeBy(float amount) {
+        float oldWidth = width;
+        paint.setTextSize(10);
+        fontSize *= amount;
+        paint.setTextSize(fontSize);
+        int oldHeight = height;
+        measure(text);
+        this.y += (oldHeight - height) / 2;
+        this.x += (oldWidth - width) / 2;
+    }
+
     public void renderInto(Canvas canvas, boolean showBorders) {
-        canvas.drawText(text, x - threshold / 2, y + height - threshold / 2, paint);
+        float finalX = x, finalY = y;
+        canvas.save();
+        canvas.translate(finalX, finalY);
+        if (rotation != 0) {
+            canvas.rotate((float)Math.toDegrees(rotation), width / 2, height / 2);
+        }
+
+        canvas.drawText(text, - threshold / 2, height - threshold / 2, paint);
         if (showBorders) renderBorders(canvas);
+        canvas.restore();
     }
 
     @Override
